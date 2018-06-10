@@ -1,0 +1,10 @@
+
+package basic.ast;
+
+import java.util.List;
+import java.util.ArrayList;
+
+public class Apply extends Expression {
+	
+}
+

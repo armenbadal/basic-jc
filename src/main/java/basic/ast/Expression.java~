@@ -1,0 +1,6 @@
+
+package basic.ast;
+
+public abstract class Expression extends Node {
+}
+

@@ -1,0 +1,9 @@
+
+package basic.ast;
+
+public abstract class Visitor {
+	public void visit(Node n) {}
+	public void visit(Program p) {}
+	public void visit(Subroutine s) {}
+}
+

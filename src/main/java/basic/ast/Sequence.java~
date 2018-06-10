@@ -1,0 +1,10 @@
+
+package basic.ast;
+
+public class Sequence extends Statement {
+	public Statement[] items = null;
+
+	public Sequence()
+	{}
+}
+

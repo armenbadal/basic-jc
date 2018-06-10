@@ -1,0 +1,12 @@
+
+package basic.ast;
+
+public class Number extends Expression {
+	public double value = 0.0;
+
+	public Number( double vl )
+	{
+		value = vl;
+	}
+}
+

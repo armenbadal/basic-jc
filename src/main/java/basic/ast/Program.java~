@@ -1,0 +1,11 @@
+
+package basic.ast;
+
+public class Program extends Node {
+	public String fileName;
+	public Subroutine[] members;
+
+	public Program()
+	{}
+}
+

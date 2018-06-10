@@ -1,0 +1,27 @@
+
+plugins {
+    id 'java'
+    id 'application'
+    id 'antlr'
+}
+
+mainClassName = 'basic.driver.Main'
+
+dependencies {
+    compile 'org.apache.bcel:bcel:6.2'
+    antlr 'org.antlr:antlr4:4.7.1'
+}
+
+repositories {
+    mavenCentral()
+}
+
+generateGrammarSource {
+    maxHeapSize = "64m"
+    arguments += ["-encoding", "utf-8", "-no-listener", "-visitor"]
+}
+
+run {
+	args '/home/pi/Projects/basic-ir/cases/case02.bas'
+}
+

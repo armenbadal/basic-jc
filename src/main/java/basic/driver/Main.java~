@@ -1,0 +1,38 @@
+
+package basic.driver;
+
+import org.antlr.v4.runtime.*;
+import org.antlr.v4.runtime.tree.*;
+
+import basic.parser.*;
+
+public class Main {
+	///
+	public static void compile( String source ) throws Exception
+	{
+		CharStream input = CharStreams.fromFileName(source);
+        BasicLexer lexer = new BasicLexer(input);
+        CommonTokenStream tokens = new CommonTokenStream(lexer);
+        BasicParser parser = new BasicParser(tokens);
+        ParseTree tree = parser.program();
+        System.out.println(tree.toStringTree(parser));
+
+		AstBuilder ab = new AstBuilder();
+		ab.visit(tree);
+	}
+
+	///
+	public static void main( String[] args )
+	{
+		try {
+			if( args.length > 0 ) 
+				compile(args[0]);
+		}
+		catch( Exception ex ) {
+			System.err.println(ex.getMessage());
+		}
+		
+		System.out.println("Ok!");
+	}
+}
+

@@ -1,0 +1,18 @@
+
+package basic.codegen;
+
+import basic.ast.*;
+
+public class Compiler /*extends Visitor*/ {
+
+	//
+	public Compiler()
+	{}
+
+	//
+	private void compileProgram( Program pr )
+	{
+		
+	}
+}
+

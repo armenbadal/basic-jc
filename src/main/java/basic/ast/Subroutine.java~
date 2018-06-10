@@ -1,0 +1,24 @@
+
+package basic.ast;
+
+import java.util.List;
+
+public class Subroutine extends Node {
+	public String name = null;
+	public List<Variable> parameters = null;
+	public Statement body = null;
+
+	public List<Variable> locals = null;
+
+	public Subroutine( String nm )
+	{
+		name = nm;
+	}
+
+	@Override
+	public String toString()
+	{
+		return String.format("SUB %s", name);
+	}
+}
+
