@@ -13,7 +13,7 @@ public class Main {
 		CharStream input = CharStreams.fromFileName(source);
         BasicLexer lexer = new BasicLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
-        BasicParser parser = new BasicParser(tokens);
+        BasicParser parser = new BasicParser(source, tokens);
         ParseTree parseTree = parser.program();
         System.out.println(parseTree.toStringTree(parser));
 

@@ -6,7 +6,10 @@ import basic.ast.*;
 import org.apache.bcel.*;
 import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
+
 //import java.io.*;
+import java.nio.file.*;
+
 
 /**/
 public class Compiler /*extends Visitor*/ {
@@ -21,6 +24,8 @@ public class Compiler /*extends Visitor*/ {
 	{
 		program = prog;
 		// TODO: ֆայլի անունից անջատել վերջավորությունը
+		Path p = Paths.get(program.fileName);
+		System.out.println(p.getFileName().toString());
 		
 		classGen = new ClassGen("դասիԱնունը", "java.lang.Object", "ֆայլիԱնունը",
 								Const.ACC_PUBLIC | Const.ACC_SUPER, new String[] {  });
@@ -58,16 +63,16 @@ public class Compiler /*extends Visitor*/ {
 	//
 	private void compile( Subroutine subr )
 	{
-		InstructionList il = new InstructionList();
-		MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
-										 Type.VOID, new Type[] { new ArrayType(Type.STRING, 1) },
-										 new String[] { "arg0" }, "main", "Ex0", il, _cp);
+		// InstructionList il = new InstructionList();
+		// MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
+		// 								 Type.VOID, new Type[] { new ArrayType(Type.STRING, 1) },
+		// 								 new String[] { "arg0" }, "main", "Ex0", il, constPool);
 		
-		InstructionHandle ih_0 = il.append(_factory.createReturn(Type.VOID));
-		method.setMaxStack();
-		method.setMaxLocals();
-		_cg.addMethod(method.getMethod());
-		il.dispose();
+		// InstructionHandle ih_0 = il.append(factory.createReturn(Type.VOID));
+		// method.setMaxStack();
+		// method.setMaxLocals();
+		// classGen.addMethod(method.getMethod());
+		// il.dispose();
 	}
 }
 

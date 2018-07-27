@@ -5,6 +5,16 @@ grammar Basic;
 package basic.parser;
 }
 
+@parser::members {
+    public static String fileName = null;
+
+    public BasicParser( String name, TokenStream tokens )
+    {
+        this(tokens);
+        fileName = name;
+    }
+}
+
 program
     : newlines? (subroutine newlines)*
     ;

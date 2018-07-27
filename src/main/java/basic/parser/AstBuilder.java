@@ -30,12 +30,16 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitProgram(BasicParser.ProgramContext ctx)
 	{
 		program = new Program();
-
+		program.fileName = BasicParser.fileName;
+			
 		for( BasicParser.SubroutineContext sc : ctx.subroutine() )
 			program.members.add((Subroutine)visitSubroutine(sc));
 
-		for( String nm : unresolved.keySet() )
-			System.out.println(nm);
+		// for( String nm : unresolved.keySet() )
+		// 	System.out.println(nm);
+
+		// java.nio.file.Path p = java.nio.file.Paths.get(program.fileName);
+		// System.out.println(p.getFileName().toString());
 		
 		return program;
 	}
