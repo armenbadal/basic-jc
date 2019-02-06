@@ -8,5 +8,11 @@ public class Print extends Statement {
 	{
 		expr = ex;
 	}
+
+	@Override
+	public String toString()
+	{
+		return "PRINT " + expr.toString();
+	}
 }
 

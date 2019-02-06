@@ -12,5 +12,11 @@ public class Binary extends Expression {
 		left = el;
 		right = er;
 	}
+
+	@Override
+	public String toString()
+	{
+		return left.toString() + " " + oper.mnemonic + " " + right.toString();
+	}
 }
 

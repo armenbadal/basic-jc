@@ -8,5 +8,11 @@ public class Variable extends Expression {
 	{
 		name = nm;
 	}
+
+	@Override
+	public String toString()
+	{
+		return name;
+	}
 }
 

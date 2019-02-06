@@ -13,5 +13,16 @@ public class Program extends Node {
 		fileName = "";
 		members = new ArrayList<>();
 	}
+
+	@Override
+	public String toString()
+	{
+		String res = "' " + fileName + "\n";
+		for(Subroutine si : members) {
+			res += si.toString();
+			res += "\n";
+		}
+		return res;
+	}
 }
 

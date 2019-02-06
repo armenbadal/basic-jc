@@ -2,21 +2,28 @@
 package basic.ast;
 
 public enum Operation {
-	None,
-	Or,
-	And,
-	Eq,
-	Ne,
-	Gt,
-	Ge,
-	Lt,
-	Le,
-	Add,
-	Sub,
-	Conc,
-	Mul,
-	Div,
-	Pow,
-	Not
+	None("None"),
+	Or("OR"),
+	And("AND"),
+	Eq("="),
+	Ne("<>"),
+	Gt(">"),
+	Ge(">="),
+	Lt("<"),
+	Le("<="),
+	Add("+"),
+	Sub("-"),
+	Conc("&"),
+	Mul("*"),
+	Div("/"),
+	Pow("^"),
+	Not("NOT");
+
+	public String mnemonic = "None";
+
+	Operation( String mn )
+	{
+		mnemonic = mn;
+	}
 }
 

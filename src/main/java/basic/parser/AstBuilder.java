@@ -60,7 +60,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		
 		current.body = (Statement)visitSequence(ctx.sequence());
 
-		/**/System.out.println("-------------");System.out.println(current);
+		//**/System.out.println("-------------");System.out.println(current);
 		return current;
 	}
 
@@ -243,7 +243,6 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitText(BasicParser.TextContext ctx)
 	{
 		String lex = ctx.TEXT().getText();
-		// TODO: remove quotes
 		return new Text(lex);
 	}
 

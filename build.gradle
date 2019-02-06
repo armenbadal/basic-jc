@@ -21,7 +21,11 @@ generateGrammarSource {
     arguments += ["-encoding", "utf-8", "-no-listener", "-visitor"]
 }
 
+compileJava {
+    options.encoding = "UTF-8"
+}
+
 run {
-	args '/home/pi/Projects/basic-ir/cases/case02.bas'
+	args project.projectDir.getPath() + '/cases/case01.bas'
 }
 
