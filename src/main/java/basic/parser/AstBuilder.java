@@ -59,8 +59,6 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		current.locals.addAll(current.parameters);
 		
 		current.body = (Statement)visitSequence(ctx.sequence());
-
-		//**/System.out.println("-------------");System.out.println(current);
 		return current;
 	}
 
