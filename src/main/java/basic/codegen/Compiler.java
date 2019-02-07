@@ -27,8 +27,8 @@ public class Compiler /*extends Visitor*/ {
 		Path p = Paths.get(program.fileName);
 		System.out.println(p.getFileName().toString());
 		
-		classGen = new ClassGen("դասիԱնունը", "java.lang.Object", "ֆայլիԱնունը",
-								Const.ACC_PUBLIC | Const.ACC_SUPER, new String[] {  });
+		classGen = new ClassGen("ԴասիԱնունը", "java.lang.Object", "ՖայլիԱնունը",
+								Const.ACC_PUBLIC | Const.ACC_SUPER, new String[] {});
 		constPool = classGen.getConstantPool();
 		instrFactory = new InstructionFactory(classGen, constPool);
 	}
@@ -40,6 +40,13 @@ public class Compiler /*extends Visitor*/ {
 		
 		for( Subroutine subr : program.members )
 			compile(subr);
+
+        // DEBUG
+        try {
+            classGen.getJavaClass().dump(new java.io.FileOutputStream("/home/pi/Projects/b4/Ex0g.class"));
+        }
+        catch(java.io.IOException ex) {
+        }
 	}
 
 	// 
@@ -47,7 +54,7 @@ public class Compiler /*extends Visitor*/ {
 	{
 		InstructionList il = new InstructionList();
 		MethodGen method = new MethodGen(Const.ACC_PUBLIC, Type.VOID, Type.NO_ARGS,
-										 new String[] {  }, "<init>", "դասիԱնունը",
+										 new String[] {  }, "<init>", "ԴասիԱնունը",
 										 il, constPool);
 
 		il.append(instrFactory.createLoad(Type.OBJECT, 0));
@@ -63,16 +70,29 @@ public class Compiler /*extends Visitor*/ {
 	//
 	private void compile( Subroutine subr )
 	{
-		// InstructionList il = new InstructionList();
-		// MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
-		// 								 Type.VOID, new Type[] { new ArrayType(Type.STRING, 1) },
-		// 								 new String[] { "arg0" }, "main", "Ex0", il, constPool);
+        // հրամանների ցուցակ
+		InstructionList il = new InstructionList();
+
+        int parcount = subr.parameters.size();
+        Type partypes[] = new Type[parcount];
+        String parnames[] = new String[parcount];
+        for( int i = 0; i < parcount; ++i ) {
+            parnames[i] = subr.parameters.get(i).name;
+            partypes[i] = parnames[i].endsWith("$") ? Type.STRING : Type.DOUBLE;
+        }
+		MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
+										 Type.VOID,
+                                         partypes,
+		 								 parnames,
+                                         subr.name,
+                                         "դասիԱնունը",
+                                         il, constPool);
 		
-		// InstructionHandle ih_0 = il.append(factory.createReturn(Type.VOID));
-		// method.setMaxStack();
-		// method.setMaxLocals();
-		// classGen.addMethod(method.getMethod());
-		// il.dispose();
+		InstructionHandle ih_0 = il.append(instrFactory.createReturn(Type.VOID));
+		method.setMaxStack();
+		method.setMaxLocals();
+		classGen.addMethod(method.getMethod());
+		il.dispose();
 	}
 }
 

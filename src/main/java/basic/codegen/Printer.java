@@ -33,6 +33,7 @@ public class Printer extends Visitor {
 		print("END SUB"); nl();
 	}
 
+    /*
 	@Override
 	public void visit( Let s )
 	{
@@ -83,7 +84,7 @@ public class Printer extends Visitor {
 	@Override
 	public void visit( Text e )
 	{
-		System.out.print(e.value)
+		System.out.print(e.value);
 	}
 
 	@Override
@@ -91,6 +92,7 @@ public class Printer extends Visitor {
 	{
 		System.out.print(e.name);
 	}
+    */
 }
 
 

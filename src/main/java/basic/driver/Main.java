@@ -5,6 +5,7 @@ import org.antlr.v4.runtime.*;
 import org.antlr.v4.runtime.tree.*;
 
 import basic.parser.*;
+import basic.codegen.*;
 
 public class Main {
 	///
@@ -20,6 +21,9 @@ public class Main {
 		AstBuilder astBuilder = new AstBuilder();
 		basic.ast.Node ast = astBuilder.visit(parseTree);
 		System.out.println(ast);
+
+        basic.codegen.Compiler cr = new basic.codegen.Compiler((basic.ast.Program)ast);
+        cr.compile();
 	}
 
 	///
