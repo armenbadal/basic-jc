@@ -42,11 +42,13 @@ public class Compiler /*extends Visitor*/ {
 			compile(subr);
 
         // DEBUG
+		/*
         try {
             classGen.getJavaClass().dump(new java.io.FileOutputStream("/home/pi/Projects/b4/Ex0g.class"));
         }
         catch(java.io.IOException ex) {
         }
+		*/
 	}
 
 	// 
@@ -85,7 +87,7 @@ public class Compiler /*extends Visitor*/ {
                                          partypes,
 		 								 parnames,
                                          subr.name,
-                                         "դասիԱնունը",
+                                         "ԴասիԱնունը",
                                          il, constPool);
 		
 		InstructionHandle ih_0 = il.append(instrFactory.createReturn(Type.VOID));
