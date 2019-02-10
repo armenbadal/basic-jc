@@ -26,6 +26,6 @@ compileJava {
 }
 
 run {
-	args project.projectDir.getPath() + '/cases/case01.bas'
+	args project.projectDir.getPath() + '/cases/case02.bas'
 }
 

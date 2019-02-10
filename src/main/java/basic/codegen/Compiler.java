@@ -43,6 +43,7 @@ public class Compiler /*extends Visitor*/ {
 	public void compile()
 	{
 		createConstructor();
+        createMain();
 		
 		for( Subroutine subr : program.members )
 			compile(subr);
@@ -71,6 +72,23 @@ public class Compiler /*extends Visitor*/ {
 		classGen.addMethod(method.getMethod());
 		il.dispose();
 	}
+
+    //
+    private void createMain()
+    {
+        InstructionList il = new InstructionList();
+        MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
+                                         Type.VOID,
+                                         new Type[] { new ArrayType(Type.STRING, 1) },
+                                         new String[] { "args" },
+                                         "main", progName, il, constPool);
+        
+        il.append(instrFactory.createReturn(Type.VOID));
+        method.setMaxStack();
+        method.setMaxLocals();
+        classGen.addMethod(method.getMethod());
+        il.dispose();
+    }
 
 	//
 	private void compile( Subroutine subr )
@@ -152,25 +170,34 @@ public class Compiler /*extends Visitor*/ {
     }
     
     //
-    private void compile( Let el )
+    private void compile( Let s )
     {
-        compile(el.expr);
+        compile(s.expr);
 
-        Integer ix = nameMap.get(el.place.name);
+        Integer ix = nameMap.get(s.place.name);
         if( ix != null ) {
-            Type y = el.place.type == 'T' ? Type.OBJECT : Type.DOUBLE;
+            Type y = s.place.type == 'T' ? Type.OBJECT : Type.DOUBLE;
             currentInstrList.append(instrFactory.createStore(y, ix));
         }
     }
     
     //
-    private void compile( Input pr )
+    private void compile( Input s )
     {
     }
 
     //
-    private void compile( Print in )
+    private void compile( Print s )
     {
+        compile(s.expr);
+
+        Type ety = s.expr.type == 'T' ? Type.STRING : Type.DOUBLE;
+        InvokeInstruction pln =
+            instrFactory.createInvoke("java.io.PrintStream",
+                                      "println", Type.VOID,
+                                      new Type[] { ety },
+                                      Const.INVOKEVIRTUAL);
+        currentInstrList.append(pln);
     }
 
     //
