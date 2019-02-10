@@ -2,6 +2,11 @@
 package basic.ast;
 
 public abstract class Expression extends Node {
-	// public Type type;
+    //
+    // 'T' for Text
+    // 'R' for Real
+    // ...
+    //
+	public char type;
 }
 

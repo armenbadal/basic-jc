@@ -1,9 +1,10 @@
 
 package basic.ast;
 
-import java.util.List;
 import java.util.ArrayList;
+import java.util.List;
 
+//
 public class Subroutine extends Node {
 	public String name;
 	public List<Variable> parameters;
@@ -26,8 +27,13 @@ public class Subroutine extends Node {
 		for( Variable vr : parameters )
 			sb.append(vr.name).append(" ");
 		sb.append(")\n");
-		for( Variable vr : locals )
-			sb.append("|\t").append(vr.name).append("\n");
+        
+		for( Variable vi : locals ) {
+			sb.append("|\t");
+            sb.append(vi.toString());
+            sb.append("\n");
+        }
+        
 		sb.append(body.toString());
 		sb.append("END SUB\n");
 		return sb.toString();

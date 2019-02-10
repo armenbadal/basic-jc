@@ -7,6 +7,7 @@ public class Variable extends Expression {
 	public Variable( String nm )
 	{
 		name = nm;
+        type = name.endsWith("$") ? 'T' : 'D';
 	}
 
 	@Override

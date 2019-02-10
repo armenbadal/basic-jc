@@ -7,6 +7,7 @@ public class Real extends Expression {
 	public Real( double vl )
 	{
 		value = vl;
+        type = 'R';
 	}
 }
 

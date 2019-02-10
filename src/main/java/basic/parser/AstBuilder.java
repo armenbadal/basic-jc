@@ -54,9 +54,8 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		for( Token tk : ctx.params ) {
 			Variable pr = new Variable(tk.getText());
 			current.parameters.add(pr);
+            current.locals.add(pr);
 		}
-
-		current.locals.addAll(current.parameters);
 		
 		current.body = (Statement)visitSequence(ctx.sequence());
 		return current;
