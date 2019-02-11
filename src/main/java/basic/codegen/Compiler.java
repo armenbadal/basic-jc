@@ -231,6 +231,7 @@ public class Compiler {
     {
         compile(e.left);
         compile(e.right);
+		
         switch( e.oper ) {
             case Add:
                 currentInstrList.append(InstructionConst.DADD);
@@ -245,7 +246,9 @@ public class Compiler {
     }
 
     private void compile( Unary e )
-    {}
+    {
+        compile(e.expr);
+    }
 
     private void compile( Apply e )
     {}
