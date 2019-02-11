@@ -12,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 /**/
-public class Compiler /*extends Visitor*/ {
+public class Compiler {
 	private ClassGen classGen = null;
 	private ConstantPoolGen constPool = null;
 	private InstructionFactory instrFactory = null;
@@ -44,15 +44,14 @@ public class Compiler /*extends Visitor*/ {
 	{
 		createConstructor();
         createMain();
-		
-		for( Subroutine subr : program.members )
-			compile(subr);
 
-        // DEBUG
-        try {
-            classGen.getJavaClass().dump(new java.io.FileOutputStream("/home/pi/Projects/b4/Ex0g.class"));
-        }
-        catch(java.io.IOException ex) {}
+		compile(program);
+
+        //// DEBUG
+        //try {
+        //    classGen.getJavaClass().dump(new java.io.FileOutputStream("/home/pi/Projects/b4/Ex0g.class"));
+        //}
+        //catch(java.io.IOException ex) {}
 	}
 
 	// 
@@ -90,7 +89,12 @@ public class Compiler /*extends Visitor*/ {
         il.dispose();
     }
 
-	//
+	private void compile( Program pr )
+	{
+		for( Subroutine subr : pr.members )
+			compile(subr);
+	}
+
 	private void compile( Subroutine subr )
 	{
         // հաշվարկել լոկալ փոփոխականների ինդեքսները
@@ -141,35 +145,32 @@ public class Compiler /*extends Visitor*/ {
         nameMap = null;
 	}
 
-    //
-    private void compile( Statement s )
-    {
-        if( s instanceof Sequence )
-		 	compile((Sequence)s);
-        else if( s instanceof Let )
-		 	compile((Let)s);
-        else if( s instanceof Input )
-		 	compile((Input)s);
-        else if( s instanceof Print )
-		 	compile((Print)s);
-        else if( s instanceof If )
-		 	compile((If)s);
-        else if( s instanceof While )
-		 	compile((While)s);
-        else if( s instanceof For )
-		 	compile((For)s);
-        else if( s instanceof Call )
-		 	compile((Call)s);
-    }
+	private void compile( Statement s )
+	{
+		if( s instanceof Sequence )
+			compile((Sequence)s);
+		else if( s instanceof Let )
+			compile((Let)s);
+		else if( s instanceof Input )
+			compile((Input)s);
+		else if( s instanceof Print )
+			compile((Print)s);
+		else if( s instanceof If )
+			compile((If)s);
+		else if( s instanceof While )
+			compile((While)s);
+		else if( s instanceof For )
+			compile((For)s);
+		else if( s instanceof Call )
+			compile((Call)s);
+	}
 
-    //
     private void compile( Sequence s )
     {
         for( Statement si : s.items )
             compile(si);
     }
     
-    //
     private void compile( Let s )
     {
         compile(s.expr);
@@ -181,12 +182,10 @@ public class Compiler /*extends Visitor*/ {
         }
     }
     
-    //
     private void compile( Input s )
     {
     }
 
-    //
     private void compile( Print s )
     {
         compile(s.expr);
@@ -200,26 +199,20 @@ public class Compiler /*extends Visitor*/ {
         currentInstrList.append(pln);
     }
 
-    //
     private void compile( If s )
     {}
 
-    //
     private void compile( While s )
     {}
 
-    //
     private void compile( For s )
     {}
 
-    //
     private void compile( Call s )
     {}
 
-    
-    //
     private void compile( Expression e )
-    {
+	{
         if( e instanceof Binary )
             compile((Binary)e);
         else if( e instanceof Unary )
@@ -232,9 +225,8 @@ public class Compiler /*extends Visitor*/ {
             compile((Real)e);
         else if( e instanceof Text )
             compile((Text)e);
-    }
+	}
 
-    //
     private void compile( Binary e )
     {
         compile(e.left);
@@ -252,17 +244,12 @@ public class Compiler /*extends Visitor*/ {
         }
     }
 
-    //
     private void compile( Unary e )
-    {
-    }
+    {}
 
-    //
     private void compile( Apply e )
-    {
-    }
+    {}
     
-    //
     private void compile( Variable e )
     {
         Integer ix = nameMap.get(e.name);
@@ -272,13 +259,11 @@ public class Compiler /*extends Visitor*/ {
         }
     }
     
-    //
     private void compile( Real e )
     {
         currentInstrList.append(new PUSH(constPool, e.value));
     }
         
-    //
     private void compile( Text e )
     {
         currentInstrList.append(new PUSH(constPool, e.value));

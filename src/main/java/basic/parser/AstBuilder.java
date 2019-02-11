@@ -38,9 +38,6 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		// for( String nm : unresolved.keySet() )
 		// 	System.out.println(nm);
 
-		// java.nio.file.Path p = java.nio.file.Paths.get(program.fileName);
-		// System.out.println(p.getFileName().toString());
-		
 		return program;
 	}
 
