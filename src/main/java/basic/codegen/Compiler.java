@@ -102,7 +102,7 @@ public class Compiler {
         int inx = 0;
         for( Variable vi : subr.locals ) {
             nameMap.put(vi.name, inx);
-            inx += vi.type == 'T' ? 1 : 2;
+            inx += vi.type == basic.ast.Node.Type.Text ? 1 : 2;
         }
         
         // հրամանների ցուցակ
@@ -177,7 +177,7 @@ public class Compiler {
 
         Integer ix = nameMap.get(s.place.name);
         if( ix != null ) {
-            Type y = s.place.type == 'T' ? Type.OBJECT : Type.DOUBLE;
+            Type y = s.place.type == basic.ast.Node.Type.Text ? Type.OBJECT : Type.DOUBLE;
             currentInstrList.append(instrFactory.createStore(y, ix));
         }
     }
@@ -190,7 +190,7 @@ public class Compiler {
     {
         compile(s.expr);
 
-        Type ety = s.expr.type == 'T' ? Type.STRING : Type.DOUBLE;
+        Type ety = s.expr.type == basic.ast.Node.Type.Text ? Type.STRING : Type.DOUBLE;
         InvokeInstruction pln =
             instrFactory.createInvoke("java.io.PrintStream",
                                       "println", Type.VOID,
@@ -257,7 +257,7 @@ public class Compiler {
     {
         Integer ix = nameMap.get(e.name);
         if( ix != null ) {
-            Type y = e.type == 'T' ? Type.OBJECT : Type.DOUBLE;
+            Type y = e.type == basic.ast.Node.Type.Text ? Type.OBJECT : Type.DOUBLE;
             currentInstrList.append(instrFactory.createStore(y, ix));
         }
     }

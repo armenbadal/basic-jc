@@ -243,8 +243,8 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitReal(BasicParser.RealContext ctx)
 	{
-		String lex = ctx.REAL().getText();
-		double nval = Double.parseDouble(lex);
+		TerminalNode reno = ctx.REAL();
+		double nval = Double.parseDouble(reno.getText());
 		return new Real(nval);
 	}
 

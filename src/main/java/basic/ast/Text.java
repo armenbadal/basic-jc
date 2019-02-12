@@ -7,7 +7,7 @@ public class Text extends Expression {
 	public Text( String vl )
 	{
 		value = vl.substring(1, vl.length()-1);
-        type = 'T';
+        type = Node.Type.Text;
 	}
 
 	@Override

@@ -7,7 +7,7 @@ public class Variable extends Expression {
 	public Variable( String nm )
 	{
 		name = nm;
-        type = name.endsWith("$") ? 'T' : 'D';
+        type = Node.Type.of(name);
 	}
 
 	@Override
