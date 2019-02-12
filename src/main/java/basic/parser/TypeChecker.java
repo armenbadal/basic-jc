@@ -126,8 +126,9 @@ public class TypeChecker {
 	public void check( Apply e ) throws TypeError
     {
         check(e.callee);
-        for( Expression a : e.arguments)
+        for( Expression a : e.arguments )
             check(a);
+        // TODO: compare signature and parameter list
     }
 
 	public void check( Variable e )
