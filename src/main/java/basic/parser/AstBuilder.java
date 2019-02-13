@@ -6,10 +6,12 @@ import org.antlr.v4.runtime.tree.*;
 
 import basic.ast.*;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.HashMap;
+import java.util.stream.Collectors;
 
 ///
 public class AstBuilder extends BasicBaseVisitor<Node> {
@@ -24,6 +26,8 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public AstBuilder()
 	{
 		unresolved = new HashMap<>();
+		// TODO: Read basic-jc-rt.jar and create list of predefined functions.
+		// For each item created instance of subroutine (without body).
 	}
 	
 	@Override
@@ -44,16 +48,16 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitSubroutine(BasicParser.SubroutineContext ctx)
 	{
-		// ենթածրագիր տրված անունով
-		current = new Subroutine(ctx.name.getText());
-		
+		// անունը
+		String name = ctx.name.getText();
 		// պարամետրերը
-		for( Token tk : ctx.params ) {
-			Variable pr = new Variable(tk.getText());
-			current.parameters.add(pr);
-            current.locals.add(pr);
-		}
-		
+		List<String> pars = ctx.params.stream().map(Token::getText).collect(Collectors.toList());
+		// ենթածրագիր տրված անունով
+		current = new Subroutine(name, pars);
+
+     	current.locals = new ArrayList<>();
+		current.parameters.forEach(p -> current.locals.add(new Variable(p)));
+
 		current.body = (Statement)visitSequence(ctx.sequence());
 		return current;
 	}

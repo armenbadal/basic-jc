@@ -110,15 +110,15 @@ public class Compiler {
 
         // վերադարձվող արժեքի տիպն ըստ ֆունկցիայի անվան
         Type retype = Type.DOUBLE;
-        if( subr.name.endsWith("$") )
+        if( basic.ast.Node.Type.of(subr.name) == basic.ast.Node.Type.Text )
             retype = Type.STRING;
         
         int parcount = subr.parameters.size();
         Type partypes[] = new Type[parcount];
         String parnames[] = new String[parcount];
         for( int i = 0; i < parcount; ++i ) {
-            parnames[i] = subr.parameters.get(i).name;
-            partypes[i] = parnames[i].endsWith("$") ? Type.STRING : Type.DOUBLE;
+            parnames[i] = subr.parameters.get(i);
+            partypes[i] = basic.ast.Node.Type.of(parnames[i]) == basic.ast.Node.Type.Text ? Type.STRING : Type.DOUBLE;
         }
 		MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
 										 retype, partypes, parnames, subr.name,
@@ -251,7 +251,11 @@ public class Compiler {
     }
 
     private void compile( Apply e )
-    {}
+    {
+        for( Expression a : e.arguments )
+            compile(a);
+        // TODO: call
+    }
     
     private void compile( Variable e )
     {

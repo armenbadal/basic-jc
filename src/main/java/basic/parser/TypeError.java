@@ -1,6 +1,6 @@
 
 package basic.parser;
 
-public class TypeError extends Exception {
+public class TypeError extends RuntimeException {
     // TODO: constructor
 }
