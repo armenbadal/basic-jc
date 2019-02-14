@@ -28,6 +28,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		unresolved = new HashMap<>();
 		// TODO: Read basic-jc-rt.jar and create list of predefined functions.
 		// For each item created instance of subroutine (without body).
+		//Builtins bis = new Builtins();
 	}
 	
 	@Override

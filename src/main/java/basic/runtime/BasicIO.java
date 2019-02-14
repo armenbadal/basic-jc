@@ -2,24 +2,24 @@
 package basic.runtime;
 
 public class BasicIO {
-    public static String readString( String prompt )
+    public static String readText( String prompt )
     {
         System.out.printf("%s ", prompt);
         return "Read string from console."; // TODO: implement this
     }
 
-    public static Double readReal( String prompt )
+    public static double readReal( String prompt )
     {
         System.out.printf("%s ", prompt);
         return 3.1415;
     }
 
-    public static void printString( String str )
+    public static void printText( String str )
     {
         System.out.println(str);
     }
 
-    public static void printString( Double rv )
+    public static void printReal( double rv )
     {
         System.out.println(rv);
     }

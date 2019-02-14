@@ -184,12 +184,13 @@ public class Compiler {
     
     private void compile( Input s )
     {
+        // TODO: call basic.runtime.read<Real|Text>
     }
 
     private void compile( Print s )
     {
         compile(s.expr);
-
+        // TODO: call basic.runtime.print<Real|Text>
         Type ety = s.expr.type == basic.ast.Node.Type.Text ? Type.STRING : Type.DOUBLE;
         InvokeInstruction pln =
             instrFactory.createInvoke("java.io.PrintStream",
