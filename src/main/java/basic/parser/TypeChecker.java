@@ -4,22 +4,9 @@ package basic.parser;
 import basic.ast.*;
 
 public class TypeChecker {
-    // void check( Node n ) throws TypeError
-	// {
-	// 	if( n instanceof Program )
-	// 		return check((Program)n);
-	// 	if( n instanceof Subroutine )
-	// 		return check((Subroutine)n);
-	// 	if( n instanceof Statement )
-	// 		return check((Statement)n);
-	// 	if( n instanceof Expression )
-	// 		return check((Expression)n);
-	// 	return null;
-	// }
-
     public void check( Program p ) throws TypeError
     {
-        for( Subroutine m : p.members)
+        for( Subroutine m : p.members )
             check(m);
     }
 
@@ -52,7 +39,9 @@ public class TypeChecker {
     {
         check(s.place);
         check(s.expr);
-        // check
+
+        if( s.expr.type != s.place.type )
+            throw new TypeError();
     }
 
 	public void check( Input s ) throws TypeError
@@ -68,6 +57,9 @@ public class TypeChecker {
 	public void check( If s ) throws TypeError
     {
         check(s.condition);
+        if( s.condition.type != Node.Type.Boolean )
+            throw new TypeError();
+        
         check(s.decision);
         check(s.alternative);
     }
@@ -75,15 +67,30 @@ public class TypeChecker {
 	public void check( While s ) throws TypeError
     {
         check(s.condition);
+        if( s.condition.type != Node.Type.Boolean )
+            throw new TypeError();
+        
         check(s.body);
     }
 
 	public void check( For s ) throws TypeError
     {
         check(s.param);
+        if( s.param.type != Node.Type.Real )
+            throw new TypeError();
+        
         check(s.from);
+        if( s.from.type != Node.Type.Real )
+            throw new TypeError();
+        
         check(s.to);
+        if( s.to.type != Node.Type.Real )
+            throw new TypeError();
+        
         check(s.step);
+        if( s.step.type != Node.Type.Real )
+            throw new TypeError();
+        
         check(s.body);
     }
 
@@ -110,8 +117,37 @@ public class TypeChecker {
 
 	public void check( Binary e ) throws TypeError
     {
-        check(e.left);
+         check(e.left);
         check(e.right);
+
+        if( e.left.type == Node.Type.Real && e.right.type == Node.Type.Real ) {
+            boolean allowed = e.oper == Operation.Add;
+            allowed = allowed || e.oper == Operation.Sub;
+            allowed = allowed || e.oper == Operation.Mul;
+            allowed = allowed || e.oper == Operation.Div;
+            allowed = allowed || e.oper == Operation.Pow;
+            if( !allowed )
+                throw new TypeError();
+        }
+        else if( e.left.type == Node.Type.Text && e.right.type == Node.Type.Text ) {
+            if( e.oper != Operation.Conc )
+                throw new TypeError();
+        }
+        else if( e.left.type == Node.Type.Boolean && e.right.type == Node.Type.Boolean ) {
+            if( e.oper != Operation.And || e.oper != Operation.Or )
+                throw new TypeError();
+        }
+
+        if( e.left.type == e.right.type ) {
+            boolean allowed = e.oper == Operation.Eq;
+            allowed = allowed || e.oper == Operation.Ne;
+            allowed = allowed || e.oper == Operation.Gt;
+            allowed = allowed || e.oper == Operation.Ge;
+            allowed = allowed || e.oper == Operation.Lt;
+            allowed = allowed || e.oper == Operation.Le;
+            if( !allowed )
+                throw new TypeError();
+        }
     }
 
 	public void check( Unary e ) throws TypeError
@@ -128,6 +164,7 @@ public class TypeChecker {
         check(e.callee);
         for( Expression a : e.arguments )
             check(a);
+        
         // TODO: compare signature and parameter list
     }
 
@@ -140,3 +177,4 @@ public class TypeChecker {
 	public void check( Text e )
     {}
 }
+

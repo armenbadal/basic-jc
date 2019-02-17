@@ -11,7 +11,8 @@ public class Subroutine extends Node {
 	public List<String> parameters;
 	public List<Variable> locals = null;
 	public Statement body = null;
-	
+    public boolean isBuiltIn = false;
+    
 	public Subroutine( String nm, List<String> pars )
 	{
 		name = nm;

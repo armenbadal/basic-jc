@@ -21,14 +21,14 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	private Subroutine current = null;
 	// ենթածրագրերի չլուծված կանչեր
 	private Map<String,List<Apply>> unresolved;
-
+    // ներդրված ենթածրագրերի գրադարան
+    private BuiltIns builtins;
+    
 	///
 	public AstBuilder()
 	{
 		unresolved = new HashMap<>();
-		// TODO: Read basic-jc-rt.jar and create list of predefined functions.
-		// For each item created instance of subroutine (without body).
-		Builtins bis = new Builtins();
+		builtins = new BuiltIns();
 	}
 	
 	@Override
@@ -175,7 +175,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitComparison(BasicParser.ComparisonContext ctx)
 	{
-		return new Binary(opcode(ctx.oper.getText()),
+		return new Binary(Operation.from(ctx.oper.getText()),
 						  (Expression)visit(ctx.left),
 						  (Expression)visit(ctx.right));
 	}
@@ -183,7 +183,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitEquality(BasicParser.EqualityContext ctx)
 	{
-		return new Binary(opcode(ctx.oper.getText()),
+		return new Binary(Operation.from(ctx.oper.getText()),
 						  (Expression)visit(ctx.left),
 						  (Expression)visit(ctx.right));
 	}
@@ -191,7 +191,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitAddition(BasicParser.AdditionContext ctx)
 	{
-		return new Binary(opcode(ctx.oper.getText()),
+		return new Binary(Operation.from(ctx.oper.getText()),
 						  (Expression)visit(ctx.left),
 						  (Expression)visit(ctx.right));
 	}
@@ -199,7 +199,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitMultiply(BasicParser.MultiplyContext ctx)
 	{
-		return new Binary(opcode(ctx.oper.getText()),
+		return new Binary(Operation.from(ctx.oper.getText()),
 						  (Expression)visit(ctx.left),
 						  (Expression)visit(ctx.right));
 	}
@@ -215,7 +215,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitUnary(BasicParser.UnaryContext ctx)
 	{
-		return new Unary(opcode(ctx.oper.getText()),
+		return new Unary(Operation.from(ctx.oper.getText()),
 						 (Expression)visit(ctx.expression()));
 	}
 
@@ -282,6 +282,8 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 			if( si.name.equals(snm) )
 				return si;
 
+        // TODO: search in builtins
+        
 		return null;
 	}
 
@@ -291,54 +293,6 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		if( !unresolved.containsKey(snm) )
 			unresolved.put(snm, new ArrayList<>());
 		unresolved.get(snm).add(cr);								
-	}
-	
-	///
-	private Operation opcode( String ops )
-	{
-		if( ops.equals("OR") )
-			return Operation.Or;
-
-		if( ops.equals("AND") )
-			return Operation.And;
-
-		if( ops.equals("=") )
-			return Operation.Eq;
-
-		if( ops.equals("<>") )
-			return Operation.Ne;
-
-		if( ops.equals(">") )
-			return Operation.Gt;
-
-		if( ops.equals(">=") )
-			return Operation.Ge;
-
-		if( ops.equals("<") )
-			return Operation.Lt;
-
-		if( ops.equals("<=") )
-			return Operation.Le;
-
-		if( ops.equals("+") )
-			return Operation.Add;
-
-		if( ops.equals("-") )
-			return Operation.Sub;
-
-		if( ops.equals("=") )
-			return Operation.Conc;
-
-		if( ops.equals("*") )
-			return Operation.Mul;
-
-		if( ops.equals("/") )
-			return Operation.Div;
-
-		if( ops.equals("NOT") )
-			return Operation.Not;
-
-		return Operation.None;
 	}
 }
 

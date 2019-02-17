@@ -249,6 +249,11 @@ public class Compiler {
     private void compile( Unary e )
     {
         compile(e.expr);
+
+        if( e.oper == Operation.Sub )
+            currentInstrList.append(InstructionConst.DNEG);
+        else if( e.oper == Operation.Not ) {
+        }
     }
 
     private void compile( Apply e )
