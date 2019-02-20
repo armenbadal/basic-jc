@@ -18,14 +18,22 @@ public class Compiler {
 	private InstructionFactory instrFactory = null;
     private InstructionList currentInstrList = null;
 
-    
 	private Program program;
     private String progName;
     private Map<String,Integer> nameMap;
 	
+    private Map<basic.ast.Node.Type,Type> typeMap = null;
+
 	//
 	public Compiler( Program prog )
 	{
+        // տիպերի ձևափոխման աղյուսակ
+        typeMap = new HashMap<>();
+        typeMap.put(basic.ast.Node.Type.Text, Type.STRING);
+        typeMap.put(basic.ast.Node.Type.Real, Type.DOUBLE);
+        typeMap.put(basic.ast.Node.Type.Boolean, Type.BOOLEAN);
+
+        //
 		program = prog;
 
 		int sb = program.fileName.lastIndexOf('/');
@@ -47,11 +55,12 @@ public class Compiler {
 
 		compile(program);
 
-        //// DEBUG
-        //try {
-        //    classGen.getJavaClass().dump(new java.io.FileOutputStream("/home/pi/Projects/b4/Ex0g.class"));
-        //}
-        //catch(java.io.IOException ex) {}
+        // DEBUG
+        try {
+            //classGen.getJavaClass().dump(System.out);
+            classGen.getJavaClass().dump(new java.io.FileOutputStream("Ex0g.class"));
+        }
+        catch(java.io.IOException ex) {}
 	}
 
 	// 
@@ -109,19 +118,20 @@ public class Compiler {
 		currentInstrList = new InstructionList();
 
         // վերադարձվող արժեքի տիպն ըստ ֆունկցիայի անվան
-        Type retype = Type.DOUBLE;
-        if( basic.ast.Node.Type.of(subr.name) == basic.ast.Node.Type.Text )
-            retype = Type.STRING;
+        Type retype = typeMap.get(basic.ast.Node.Type.of(subr.name));
         
         int parcount = subr.parameters.size();
         Type partypes[] = new Type[parcount];
         String parnames[] = new String[parcount];
+        String __p[] = new String[parcount];
         for( int i = 0; i < parcount; ++i ) {
             parnames[i] = subr.parameters.get(i);
-            partypes[i] = basic.ast.Node.Type.of(parnames[i]) == basic.ast.Node.Type.Text ? Type.STRING : Type.DOUBLE;
+            partypes[i] = typeMap.get(basic.ast.Node.Type.of(parnames[i]));
+            __p[i] = replaceSuffix(parnames[i]);
         }
+
 		MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
-										 retype, partypes, parnames, subr.name,
+										 retype, partypes, __p, subr.name,
                                          progName, currentInstrList, constPool);
 
         // ենթածրագրի մարմինը
@@ -131,8 +141,10 @@ public class Compiler {
         Integer rvi = nameMap.get(subr.name);
         if( rvi != null )
             currentInstrList.append(instrFactory.createLoad(retype, rvi));
-        else
+        else {
+            // TODO: 
             currentInstrList.append(new PUSH(constPool, 0));
+        }
 		currentInstrList.append(instrFactory.createReturn(retype));
         
 		method.setMaxStack();
@@ -177,8 +189,8 @@ public class Compiler {
 
         Integer ix = nameMap.get(s.place.name);
         if( ix != null ) {
-            Type y = s.place.type == basic.ast.Node.Type.Text ? Type.OBJECT : Type.DOUBLE;
-            currentInstrList.append(instrFactory.createStore(y, ix));
+            Type yp = typeMap.get(s.place.type);
+            currentInstrList.append(instrFactory.createStore(yp, ix));
         }
     }
     
@@ -189,9 +201,12 @@ public class Compiler {
 
     private void compile( Print s )
     {
+        currentInstrList.append(instrFactory.createFieldAccess("java.lang.System",
+            "out", new ObjectType("java.io.PrintStream"), Const.GETSTATIC));
+
         compile(s.expr);
         // TODO: call basic.runtime.print<Real|Text>
-        Type ety = s.expr.type == basic.ast.Node.Type.Text ? Type.STRING : Type.DOUBLE;
+        Type ety = typeMap.get(s.expr.type);
         InvokeInstruction pln =
             instrFactory.createInvoke("java.io.PrintStream",
                                       "println", Type.VOID,
@@ -253,6 +268,16 @@ public class Compiler {
         if( e.oper == Operation.Sub )
             currentInstrList.append(InstructionConst.DNEG);
         else if( e.oper == Operation.Not ) {
+            System.out.println("Here");
+            BranchInstruction ifne = instrFactory.createBranchInstruction(Const.IFNE, null);
+            currentInstrList.append(ifne);
+            currentInstrList.append(new PUSH(constPool, 1));
+            BranchInstruction go = instrFactory.createBranchInstruction(Const.GOTO, null);
+            currentInstrList.append(go);
+            InstructionHandle zero = currentInstrList.append(new PUSH(constPool, 0));
+            InstructionHandle nop = currentInstrList.append(new NOP());
+            ifne.setTarget(zero);
+            go.setTarget(nop);
         }
     }
 
@@ -267,8 +292,8 @@ public class Compiler {
     {
         Integer ix = nameMap.get(e.name);
         if( ix != null ) {
-            Type y = e.type == basic.ast.Node.Type.Text ? Type.OBJECT : Type.DOUBLE;
-            currentInstrList.append(instrFactory.createStore(y, ix));
+            Type y = typeMap.get(e.type);
+            currentInstrList.append(instrFactory.createLoad(y, ix));
         }
     }
     
@@ -280,6 +305,20 @@ public class Compiler {
     private void compile( Text e )
     {
         currentInstrList.append(new PUSH(constPool, e.value));
+    }
+
+    private String replaceSuffix( String nm )
+    {
+        if( nm.endsWith("$") )
+            return nm.replace("$", "_T");
+        
+        if( nm.endsWith("?") )
+            return nm.replace("?", "_B");
+
+        if( nm.endsWith("#") )
+            return nm.replace("$", "_R");
+
+        return nm + "_R";
     }
 }
 

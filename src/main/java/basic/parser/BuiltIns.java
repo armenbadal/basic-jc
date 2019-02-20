@@ -61,9 +61,6 @@ public class BuiltIns {
 
     public Object getByName( String nm )
     {
-        for( Map.Entry<String,String> si : signatures.entries() )
-            if( si.getKey().equals(nm) )
-                return si.getValue();
         return null;
     }
 }

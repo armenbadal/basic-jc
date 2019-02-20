@@ -19,6 +19,7 @@ public abstract class Node {
 			return Type.Real;
 		}
 	}
+	
 	public int line = 0;
 }
 
