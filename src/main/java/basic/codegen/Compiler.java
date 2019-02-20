@@ -22,7 +22,7 @@ public class Compiler {
     private String progName;
     private Map<String,Integer> nameMap;
 	
-    private Map<basic.ast.Node.Type,Type> typeMap = null;
+    private Map<basic.ast.Node.Type,Type> typeMap;
 
 	//
 	public Compiler( Program prog )
@@ -36,7 +36,7 @@ public class Compiler {
         //
 		program = prog;
 
-		int sb = program.fileName.lastIndexOf('/');
+		final int sb = program.fileName.lastIndexOf('/');
         String fileName = program.fileName.substring(sb+1);
         progName = fileName.substring(0, fileName.indexOf('.'));
 		
@@ -120,18 +120,17 @@ public class Compiler {
         // վերադարձվող արժեքի տիպն ըստ ֆունկցիայի անվան
         Type retype = typeMap.get(basic.ast.Node.Type.of(subr.name));
         
-        int parcount = subr.parameters.size();
+        final int parcount = subr.parameters.size();
         Type partypes[] = new Type[parcount];
         String parnames[] = new String[parcount];
-        String __p[] = new String[parcount];
         for( int i = 0; i < parcount; ++i ) {
-            parnames[i] = subr.parameters.get(i);
-            partypes[i] = typeMap.get(basic.ast.Node.Type.of(parnames[i]));
-            __p[i] = replaceSuffix(parnames[i]);
+            String pn = subr.parameters.get(i);
+            parnames[i] = normalize(pn);;
+            partypes[i] = typeMap.get(basic.ast.Node.Type.of(pn));
         }
 
 		MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
-										 retype, partypes, __p, subr.name,
+										 retype, partypes, parnames, normalize(subr.name),
                                          progName, currentInstrList, constPool);
 
         // ենթածրագրի մարմինը
@@ -142,8 +141,9 @@ public class Compiler {
         if( rvi != null )
             currentInstrList.append(instrFactory.createLoad(retype, rvi));
         else {
-            // TODO: 
-            currentInstrList.append(new PUSH(constPool, 0));
+            CompoundInstruction cip = new PUSH(constPool, 0.0);
+            // TODO: լրացնել Text և Boolean տիպերի համար
+            currentInstrList.append(cip);
         }
 		currentInstrList.append(instrFactory.createReturn(retype));
         
@@ -307,7 +307,7 @@ public class Compiler {
         currentInstrList.append(new PUSH(constPool, e.value));
     }
 
-    private String replaceSuffix( String nm )
+    private String normalize( String nm )
     {
         if( nm.endsWith("$") )
             return nm.replace("$", "_T");
