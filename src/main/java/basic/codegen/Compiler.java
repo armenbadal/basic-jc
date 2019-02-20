@@ -268,7 +268,6 @@ public class Compiler {
         if( e.oper == Operation.Sub )
             currentInstrList.append(InstructionConst.DNEG);
         else if( e.oper == Operation.Not ) {
-            System.out.println("Here");
             BranchInstruction ifne = instrFactory.createBranchInstruction(Const.IFNE, null);
             currentInstrList.append(ifne);
             currentInstrList.append(new PUSH(constPool, 1));
