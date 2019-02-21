@@ -3,7 +3,8 @@ package basic.parser;
 
 import java.io.IOException;
 import java.util.Enumeration;
-import java.util.Map;
+import java.util.List;
+import java.util.ArrayList;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -13,7 +14,7 @@ import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.Type;
 
 public class BuiltIns {
-    private Map<String,String> signatures = null;
+    private List<Signature> signatures = new ArrayList<>();
         
     public BuiltIns()
     {
@@ -39,18 +40,37 @@ public class BuiltIns {
                 ClassParser cps = new ClassParser(rjarname, je.getName());
                 JavaClass jcl = cps.parse();
 
-                System.out.println("Class: " + jcl.getClassName()); // D
+                String module = jcl.getClassName();
                 for( Method me : jcl.getMethods() ) {
                     if( !me.isPublic() || !me.isStatic() )
                         continue;
+
+                    String name = me.getName();
                     
                     Type rt = me.getReturnType();
+                    if( rt.equals(Type.DOUBLE) )
+                        name += "#";
+                    else if( rt.equals(Type.STRING) )
+                        name += "$";
+                    else if( rt.equals(Type.BOOLEAN) )
+                        name += "?";
+
                     Type[] ats = me.getArgumentTypes();
-                    
-                    System.out.println("    " + me);
-                    System.out.println("    < " + rt);
-                    for( Type t : ats )
-                        System.out.println("    > " + t);
+                    String[] args = new String[ats.length];
+                    int i = 0;
+                    for( Type t : ats ) {
+                        if( t.equals(Type.DOUBLE) )
+                            args[i] = String.format("a%d#", i);
+                        else if( t.equals(Type.STRING) )
+                            args[i] = String.format("a%d$", i);
+                        else if( t.equals(Type.BOOLEAN) )
+                            args[i] = String.format("a%d?", i);
+                        ++i;
+                    }
+
+                    Signature sig = new Signature(module, name, args);
+                    signatures.add(sig);
+                    System.out.println(sig);
                 }
             }
         }
