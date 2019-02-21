@@ -5,7 +5,7 @@ public abstract class Node {
 	public enum Type {
 		Real,
 		Text,
-		Boolean;
+		Logic;
 
 		public static final Type of( String nm )
 		{
@@ -13,7 +13,7 @@ public abstract class Node {
 			if( c == '$' )
 				return Type.Text;
 			if( c == '?' )
-				return Type.Boolean;
+				return Type.Logic;
 			//if( c == '#' )
 			//	return Type.Real;
 			return Type.Real;

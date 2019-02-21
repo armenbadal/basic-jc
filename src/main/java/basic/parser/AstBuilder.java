@@ -58,7 +58,6 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		// ենթածրագիր տրված անունով
 		current = new Subroutine(name, pars);
 
-     	current.locals = new ArrayList<>();
 		current.parameters.forEach(p -> current.locals.add(new Variable(p)));
 
 		current.body = (Statement)visitSequence(ctx.sequence());
@@ -238,6 +237,13 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitPriority(BasicParser.PriorityContext ctx)
 	{
 		return visit(ctx.expression());
+	}
+
+	@Override
+	public Node visitLogic(BasicParser.LogicContext ctx)
+	{
+		boolean val = ctx.value.getText().equals("TRUE");
+		return new Logic(val);
 	}
 
 	@Override

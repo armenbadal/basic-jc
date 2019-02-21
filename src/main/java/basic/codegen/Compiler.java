@@ -31,7 +31,7 @@ public class Compiler {
         typeMap = new HashMap<>();
         typeMap.put(basic.ast.Node.Type.Text, Type.STRING);
         typeMap.put(basic.ast.Node.Type.Real, Type.DOUBLE);
-        typeMap.put(basic.ast.Node.Type.Boolean, Type.BOOLEAN);
+        typeMap.put(basic.ast.Node.Type.Logic, Type.BOOLEAN);
 
         //
 		program = prog;
@@ -57,8 +57,7 @@ public class Compiler {
 
         // DEBUG
         try {
-            //classGen.getJavaClass().dump(System.out);
-            classGen.getJavaClass().dump(new java.io.FileOutputStream("Ex0g.class"));
+            classGen.getJavaClass().dump(new java.io.FileOutputStream(progName + ".class"));
         }
         catch(java.io.IOException ex) {}
 	}
@@ -142,7 +141,10 @@ public class Compiler {
             currentInstrList.append(instrFactory.createLoad(retype, rvi));
         else {
             CompoundInstruction cip = new PUSH(constPool, 0.0);
-            // TODO: լրացնել Text և Boolean տիպերի համար
+            if( retype.equals(Type.STRING) )
+                cip = new PUSH(constPool, "");
+            else if( retype.equals(Type.BOOLEAN) )
+                cip = new PUSH(constPool, false);
             currentInstrList.append(cip);
         }
 		currentInstrList.append(instrFactory.createReturn(retype));

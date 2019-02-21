@@ -57,7 +57,7 @@ public class TypeChecker {
 	public void check( If s ) throws TypeError
     {
         check(s.condition);
-        if( s.condition.type != Node.Type.Boolean )
+        if( s.condition.type != Node.Type.Logic )
             throw new TypeError();
         
         check(s.decision);
@@ -67,7 +67,7 @@ public class TypeChecker {
 	public void check( While s ) throws TypeError
     {
         check(s.condition);
-        if( s.condition.type != Node.Type.Boolean )
+        if( s.condition.type != Node.Type.Logic )
             throw new TypeError();
         
         check(s.body);
@@ -133,7 +133,7 @@ public class TypeChecker {
             if( e.oper != Operation.Conc )
                 throw new TypeError();
         }
-        else if( e.left.type == Node.Type.Boolean && e.right.type == Node.Type.Boolean ) {
+        else if( e.left.type == Node.Type.Logic && e.right.type == Node.Type.Logic ) {
             if( e.oper != Operation.And || e.oper != Operation.Or )
                 throw new TypeError();
         }
@@ -153,7 +153,7 @@ public class TypeChecker {
 	public void check( Unary e ) throws TypeError
     {
         check(e.expr);
-        if( e.oper == Operation.Not && e.expr.type != Node.Type.Boolean )
+        if( e.oper == Operation.Not && e.expr.type != Node.Type.Logic )
             throw new TypeError();
         if( (e.oper == Operation.Add || e.oper == Operation.Sub) && e.expr.type != Node.Type.Real )
             throw new TypeError();

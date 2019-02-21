@@ -49,6 +49,7 @@ expression
     : IDENT     # variable
     | REAL      # real
     | TEXT      # text
+    | value=('TRUE' | 'FALSE') # logic
     | '(' expression ')'                               # priority
     | IDENT '(' (expression (',' expression)*)? ')'    # apply
     | oper=('NOT' | '-' | '+') expression              # unary
@@ -75,7 +76,8 @@ KW_FOR    : 'FOR';
 KW_TO     : 'TO';
 KW_STEP   : 'STEP';
 KW_CALL   : 'CALL';
-
+KW_TRUE   : 'TRUE';
+KW_FALSE  : 'FALSE';
 
 COMMENT
     : '\'' ~'\n'* -> skip

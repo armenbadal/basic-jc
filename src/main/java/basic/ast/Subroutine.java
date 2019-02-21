@@ -17,6 +17,7 @@ public class Subroutine extends Node {
 	{
 		name = nm;
 		parameters = new ArrayList<>(pars);
+     	locals = new ArrayList<>();
 	}
 
 	@Override
