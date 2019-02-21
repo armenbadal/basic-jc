@@ -210,10 +210,8 @@ public class Compiler {
         // TODO: call basic.runtime.print<Real|Text>
         Type ety = typeMap.get(s.expr.type);
         InvokeInstruction pln =
-            instrFactory.createInvoke("java.io.PrintStream",
-                                      "println", Type.VOID,
-                                      new Type[] { ety },
-                                      Const.INVOKEVIRTUAL);
+            instrFactory.createInvoke("java.io.PrintStream", "println", Type.VOID,
+                                      new Type[] { ety }, Const.INVOKEVIRTUAL);
         currentInstrList.append(pln);
     }
 
@@ -259,6 +257,9 @@ public class Compiler {
                 break;
             case Mul:
                 currentInstrList.append(InstructionConst.DMUL);
+                break;
+            case Conc:
+                // TODO: call basic.runtime.Concatenate
                 break;
         }
     }
