@@ -1,23 +1,28 @@
 
 package basic.ast;
 
+import java.nio.file.*;
 import java.util.List;
 import java.util.ArrayList;
 
 public class Program extends Node {
-	public String fileName;
+	public Path path;
+    public String name;
 	public List<Subroutine> members;
 
-	public Program()
+	public Program( String ph )
 	{
-		fileName = "";
+		path = Paths.get(ph);
+        name = path.getFileName().toString();
+        name = name.substring(0, name.indexOf('.'));
 		members = new ArrayList<>();
 	}
 
 	@Override
 	public String toString()
 	{
-		String res = "' " + fileName + "\n";
+		String res = "' File: " + path.toString() + "\n";
+        res += "' Module: " + name + "\n";
 		for(Subroutine si : members) {
 			res += si.toString();
 			res += "\n";

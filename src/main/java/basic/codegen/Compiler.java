@@ -19,7 +19,6 @@ public class Compiler {
     private InstructionList currentInstrList = null;
 
 	private Program program;
-    private String progName;
     private Map<String,Integer> nameMap;
 	
     private Map<basic.ast.Node.Type,Type> typeMap;
@@ -35,12 +34,9 @@ public class Compiler {
 
         //
 		program = prog;
-
-		final int sb = program.fileName.lastIndexOf('/');
-        String fileName = program.fileName.substring(sb+1);
-        progName = fileName.substring(0, fileName.indexOf('.'));
 		
-		classGen = new ClassGen(progName, "java.lang.Object", fileName,
+		classGen = new ClassGen(program.name, "java.lang.Object",
+                                program.path.toString(),
 								Const.ACC_PUBLIC | Const.ACC_SUPER,
                                 new String[] {});
 		constPool = classGen.getConstantPool();
@@ -57,7 +53,7 @@ public class Compiler {
 
         // DEBUG
         try {
-            classGen.getJavaClass().dump(new java.io.FileOutputStream(progName + ".class"));
+            classGen.getJavaClass().dump(new java.io.FileOutputStream(program.name + ".class"));
         }
         catch(java.io.IOException ex) {}
 	}
@@ -67,7 +63,7 @@ public class Compiler {
 	{
 		InstructionList il = new InstructionList();
 		MethodGen method = new MethodGen(Const.ACC_PUBLIC, Type.VOID, Type.NO_ARGS,
-										 new String[] {}, "<init>", progName,
+										 new String[] {}, "<init>", program.name,
 										 il, constPool);
 
 		il.append(instrFactory.createLoad(Type.OBJECT, 0));
@@ -88,7 +84,7 @@ public class Compiler {
                                          Type.VOID,
                                          new Type[] { new ArrayType(Type.STRING, 1) },
                                          new String[] { "args" },
-                                         "main", progName, il, constPool);
+                                         "main", program.name, il, constPool);
         
         il.append(instrFactory.createReturn(Type.VOID));
         method.setMaxStack();
@@ -130,7 +126,7 @@ public class Compiler {
 
 		MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
 										 retype, partypes, parnames, normalize(subr.name),
-                                         progName, currentInstrList, constPool);
+                                         program.name, currentInstrList, constPool);
 
         // ենթածրագրի մարմինը
         compile(subr.body);

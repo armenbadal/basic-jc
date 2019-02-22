@@ -7,13 +7,14 @@ import java.util.stream.Collectors;
 
 //
 public class Subroutine extends Node {
+    public String module;
 	public String name;
 	public List<String> parameters;
 	public List<Variable> locals = null;
 	public Statement body = null;
     public boolean isBuiltIn = false;
     
-	public Subroutine( String nm, List<String> pars )
+	public Subroutine( String mo, String nm, List<String> pars )
 	{
 		name = nm;
 		parameters = new ArrayList<>(pars);

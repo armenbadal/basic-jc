@@ -34,8 +34,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitProgram(BasicParser.ProgramContext ctx)
 	{
-		program = new Program();
-		program.fileName = BasicParser.fileName;
+		program = new Program(BasicParser.fileName);
 			
 		for( BasicParser.SubroutineContext sc : ctx.subroutine() )
 			program.members.add((Subroutine)visitSubroutine(sc));
@@ -50,13 +49,13 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitSubroutine(BasicParser.SubroutineContext ctx)
 	{
 		// անունը
-		String name = ctx.name.getText();
+		String sname = ctx.name.getText();
 		// պարամետրերը
 		List<String> pars = ctx.params.stream()
             .map(Token::getText)
             .collect(Collectors.toList());
 		// ենթածրագիր տրված անունով
-		current = new Subroutine(name, pars);
+		current = new Subroutine(program.name, sname, pars);
 
 		current.parameters.forEach(p -> current.locals.add(new Variable(p)));
 
