@@ -1,10 +1,14 @@
 
 package basic.parser;
 
+import basic.ast.Subroutine;
+
 import java.io.IOException;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ArrayList;
+import java.util.Map;
+import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 
@@ -14,7 +18,7 @@ import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.Type;
 
 public class BuiltIns {
-    private List<Signature> signatures = new ArrayList<>();
+    public List<Subroutine> subroutines = new ArrayList<>();
         
     public BuiltIns()
     {
@@ -28,6 +32,12 @@ public class BuiltIns {
                 break;
             }
 
+        //
+        Map<Type,String> suffix = new HashMap<>();
+        suffix.put(Type.STRING, "$");
+        suffix.put(Type.DOUBLE, "#");
+        suffix.put(Type.BOOLEAN, "?");
+        
         // գտնել basic-rt֊ի բոլոր public-static մեթոդները
         try {
             JarFile jar  = new JarFile(rjarname);
@@ -35,6 +45,8 @@ public class BuiltIns {
             while( entries.hasMoreElements() ) {
                 JarEntry je = entries.nextElement();
                 if( !je.getName().endsWith(".class") )
+                    continue;
+                if( je.getName().endsWith("IO.class") )
                     continue;
 
                 ClassParser cps = new ClassParser(rjarname, je.getName());
@@ -45,42 +57,25 @@ public class BuiltIns {
                     if( !me.isPublic() || !me.isStatic() )
                         continue;
 
-                    String name = me.getName();
-                    
-                    Type rt = me.getReturnType();
-                    if( rt.equals(Type.DOUBLE) )
-                        name += "#";
-                    else if( rt.equals(Type.STRING) )
-                        name += "$";
-                    else if( rt.equals(Type.BOOLEAN) )
-                        name += "?";
+                    final Type rt = me.getReturnType();
+                    String name = me.getName() + suffix.get(rt);
 
-                    Type[] ats = me.getArgumentTypes();
-                    String[] args = new String[ats.length];
+                    List<String> args = new ArrayList<>();
                     int i = 0;
-                    for( Type t : ats ) {
-                        if( t.equals(Type.DOUBLE) )
-                            args[i] = String.format("a%d#", i);
-                        else if( t.equals(Type.STRING) )
-                            args[i] = String.format("a%d$", i);
-                        else if( t.equals(Type.BOOLEAN) )
-                            args[i] = String.format("a%d?", i);
-                        ++i;
-                    }
+                    for( Type t : me.getArgumentTypes() )
+                        args.add(String.format("a%d%s", i++, suffix.get(t)));
 
-                    Signature sig = new Signature(module, name, args);
-                    signatures.add(sig);
-                    System.out.println(sig);
+                    Subroutine subr = new Subroutine(module, name, args);
+                    subr.isBuiltIn = true;
+                    subroutines.add(subr);
                 }
             }
         }
         catch( IOException ex ) {
             ex.printStackTrace();
         }
-    }
-
-    public Object getByName( String nm )
-    {
-        return null;
+        catch( Exception ex ) {
+            ex.printStackTrace();
+        }
     }
 }

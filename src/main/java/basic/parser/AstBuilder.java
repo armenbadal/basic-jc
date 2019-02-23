@@ -287,7 +287,9 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 			if( si.name.equals(snm) )
 				return si;
 
-        // TODO: search in builtins
+        for( Subroutine si : builtins.subroutines )
+            if( si.name.equalsIgnoreCase(snm) )
+                return si;
         
 		return null;
 	}

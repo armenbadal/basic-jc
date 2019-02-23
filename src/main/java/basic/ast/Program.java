@@ -21,7 +21,8 @@ public class Program extends Node {
 	@Override
 	public String toString()
 	{
-		String res = "' File: " + path.toString() + "\n";
+		String res = "' - - - - - - - - - -\n";
+        res += "' File: " + path.toString() + "\n";
         res += "' Module: " + name + "\n";
 		for(Subroutine si : members) {
 			res += si.toString();

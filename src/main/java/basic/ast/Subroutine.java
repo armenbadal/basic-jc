@@ -25,14 +25,15 @@ public class Subroutine extends Node {
 	public String toString()
 	{
 		StringBuilder sb = new StringBuilder();
-		sb.append("SUB ").append(name).append("( ");
+		sb.append("\nSUB ").append(name).append("(");
 		sb.append(parameters.stream().collect(Collectors.joining(", ")));
-		sb.append(" )\n");
+		sb.append(")\n");
 
 		locals.forEach(vi -> sb.append(String.format("|\t%s\n", vi)));
         
-		sb.append(body.toString());
-		sb.append("END SUB\n");
+		if( body != null )
+            sb.append(body.toString());
+		sb.append("END SUB");
 		return sb.toString();
 	}
 }
