@@ -13,6 +13,8 @@ import java.util.Map;
 import java.util.HashMap;
 import java.util.stream.Collectors;
 
+import java.io.IOException;
+
 ///
 public class AstBuilder extends BasicBaseVisitor<Node> {
 	// AST֊ի արմատը
@@ -20,15 +22,19 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	// ընթացիկ վերլուծվող ենթածրագիրը
 	private Subroutine current = null;
 	// ենթածրագրերի չլուծված կանչեր
-	private Map<String,List<Apply>> unresolved;
+	private Map<String,List<Apply>> unresolved = new HashMap<>();
     // ներդրված ենթածրագրերի գրադարան
     private BuiltIns builtins;
     
 	///
 	public AstBuilder()
 	{
-		unresolved = new HashMap<>();
-		builtins = new BuiltIns();
+        try {
+            builtins = new BuiltIns();
+        }
+        catch( IOException ex ) {
+            ex.printStackTrace();
+        }
 	}
 	
 	@Override
@@ -221,7 +227,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitApply(BasicParser.ApplyContext ctx)
 	{
 		String nm = ctx.IDENT().getText();
-		Subroutine sbr = searchSubroutine(nm);
+		Subroutine sbr = searchSubroutine(nm); System.out.println(sbr);
 		Apply ay = new Apply(sbr);
 		for( BasicParser.ExpressionContext ec : ctx.expression() )
 			ay.arguments.add((Expression)visit(ec));

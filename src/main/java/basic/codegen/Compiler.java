@@ -96,7 +96,8 @@ public class Compiler {
 	private void compile( Program pr )
 	{
 		for( Subroutine subr : pr.members )
-			compile(subr);
+            if( !subr.isBuiltIn )
+                compile(subr);
 	}
 
 	private void compile( Subroutine subr )
@@ -237,6 +238,8 @@ public class Compiler {
             compile((Real)e);
         else if( e instanceof Text )
             compile((Text)e);
+        else if( e instanceof Logic )
+            compile((Logic)e);
 	}
 
     private void compile( Binary e )
@@ -281,9 +284,23 @@ public class Compiler {
 
     private void compile( Apply e )
     {
-        for( Expression a : e.arguments )
+        Type[] ats = new Type[e.arguments.size()];
+        int i = 0;
+        for( Expression a : e.arguments ) {
             compile(a);
-        // TODO: call
+            ats[i++] = typeMap.get(a.type);
+        }
+
+        Subroutine cl = e.callee;
+        Type rt = typeMap.get(basic.ast.Node.Type.of(cl.name));
+        InvokeInstruction icl =
+            instrFactory.createInvoke(cl.module,
+                                      normalize(cl.name),
+                                      rt,
+                                      ats,
+                                      Const.INVOKESTATIC);
+        currentInstrList.append(icl);
+        //il.append(_factory.createInvoke("basic.runtime.Basic", "Concatenate", Type.STRING, new Type[] { Type.STRING, Type.STRING }, Const.INVOKESTATIC));
     }
     
     private void compile( Variable e )
@@ -305,6 +322,11 @@ public class Compiler {
         currentInstrList.append(new PUSH(constPool, e.value));
     }
 
+    private void compile( Logic e )
+    {
+        currentInstrList.append(new PUSH(constPool, e.value));
+    }
+
     private String normalize( String nm )
     {
         if( nm.endsWith("$") )
@@ -314,7 +336,7 @@ public class Compiler {
             return nm.replace("?", "_B");
 
         if( nm.endsWith("#") )
-            return nm.replace("$", "_R");
+            return nm.replace("#", "_R");
 
         return nm + "_R";
     }
