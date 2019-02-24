@@ -227,7 +227,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitApply(BasicParser.ApplyContext ctx)
 	{
 		String nm = ctx.IDENT().getText();
-		Subroutine sbr = searchSubroutine(nm); System.out.println(sbr);
+		Subroutine sbr = searchSubroutine(nm);
 		Apply ay = new Apply(sbr);
 		for( BasicParser.ExpressionContext ec : ctx.expression() )
 			ay.arguments.add((Expression)visit(ec));

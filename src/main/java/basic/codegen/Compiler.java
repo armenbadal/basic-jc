@@ -244,6 +244,13 @@ public class Compiler {
 
     private void compile( Binary e )
     {
+        if( e.oper.kind == 'L' ) {
+        }
+        if( e.oper.kind == 'A' ) {
+        }
+        if( e.oper.kind == 'C' ) {
+        }
+        
         compile(e.left);
         compile(e.right);
 		
@@ -257,8 +264,23 @@ public class Compiler {
             case Mul:
                 currentInstrList.append(InstructionConst.DMUL);
                 break;
+            case Div:
+                currentInstrList.append(InstructionConst.DDIV);
+                break;
+            case Pow:
+                InvokeInstruction pwf =
+                    instrFactory.createInvoke("java.lang.Math", "pow", Type.DOUBLE,
+                                              new Type[] { Type.DOUBLE, Type.DOUBLE },
+                                              Const.INVOKESTATIC);
+                currentInstrList.append(pwf);
+                break;
             case Conc:
-                // TODO: call basic.runtime.Concatenate
+                InvokeInstruction concf =
+                    instrFactory.createInvoke("basic.runtime.Text", "Concatenate",
+                                              Type.STRING,
+                                              new Type[] { Type.STRING, Type.STRING },
+                                              Const.INVOKESTATIC);
+                currentInstrList.append(concf);
                 break;
         }
     }
@@ -297,10 +319,9 @@ public class Compiler {
             instrFactory.createInvoke(cl.module,
                                       normalize(cl.name),
                                       rt,
-                                      ats,
+                                      ats, // TODO: see Type.NO_ARGS case
                                       Const.INVOKESTATIC);
         currentInstrList.append(icl);
-        //il.append(_factory.createInvoke("basic.runtime.Basic", "Concatenate", Type.STRING, new Type[] { Type.STRING, Type.STRING }, Const.INVOKESTATIC));
     }
     
     private void compile( Variable e )
