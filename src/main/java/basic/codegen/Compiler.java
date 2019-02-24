@@ -46,16 +46,23 @@ public class Compiler {
 	//
 	public void compile()
 	{
-		createConstructor();
-        createMain();
-
-		compile(program);
+        try {
+            createConstructor();
+            createMain();
+            
+            compile(program);
+        }
+        catch(Exception ex) {
+            ex.printStackTrace();
+        }
 
         // DEBUG
         try {
             classGen.getJavaClass().dump(new java.io.FileOutputStream(program.name + ".class"));
         }
-        catch(java.io.IOException ex) {}
+        catch(java.io.IOException ex) {
+            ex.printStackTrace();
+        }
 	}
 
 	// 
@@ -248,9 +255,9 @@ public class Compiler {
         if( e.oper.kind == 'L' ) {
             compile(e.left);
             short bropc = 0;
-            if( e.oper.equals(Operation.Eq) )
+            if( e.oper.equals(Operation.And) )
                 bropc = Const.IFEQ;
-            else if( e.oper.equals(Operation.Ne) )
+            else if( e.oper.equals(Operation.Or) )
                 bropc = Const.IFNE;
             BranchInstruction bri = instrFactory.createBranchInstruction(bropc, null);
             currentInstrList.append(bri);
@@ -262,6 +269,7 @@ public class Compiler {
             currentInstrList.append(go);
             InstructionHandle zero = currentInstrList.append(new PUSH(constPool, 0));
             InstructionHandle nop = currentInstrList.append(new NOP());
+            ifeq.setTarget(zero);
             if( bropc == Const.IFEQ )
                 bri.setTarget(zero);
             else if( bropc == Const.IFNE )
