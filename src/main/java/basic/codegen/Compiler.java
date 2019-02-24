@@ -331,7 +331,7 @@ public class Compiler {
 
             InvokeInstruction srop = null;
             if( e.oper.equals(Operation.Conc) )
-                srop = instrFactory.createInvoke("basic.runtime.Text", "Concatenate",
+                srop = instrFactory.createInvoke("basic.runtime.Text", "_concatenate",
                                                  Type.STRING,
                                                  new Type[] { Type.STRING, Type.STRING },
                                                  Const.INVOKESTATIC);
