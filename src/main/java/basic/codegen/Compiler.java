@@ -107,7 +107,7 @@ public class Compiler {
         int inx = 0;
         for( Variable vi : subr.locals ) {
             nameMap.put(vi.name, inx);
-            inx += vi.type == basic.ast.Node.Type.Text ? 1 : 2;
+            inx += vi.type == basic.ast.Node.Type.Real ? 2 : 1;
         }
         
         // հրամանների ցուցակ
@@ -223,6 +223,7 @@ public class Compiler {
 
     private void compile( Call s )
     {}
+    
 
     private void compile( Expression e )
 	{
@@ -245,7 +246,27 @@ public class Compiler {
     private void compile( Binary e )
     {
         if( e.oper.kind == 'L' ) {
-            //
+            compile(e.left);
+            short bropc = 0;
+            if( e.oper.equals(Operation.Eq) )
+                bropc = Const.IFEQ;
+            else if( e.oper.equals(Operation.Ne) )
+                bropc = Const.IFNE;
+            BranchInstruction bri = instrFactory.createBranchInstruction(bropc, null);
+            currentInstrList.append(bri);
+            compile(e.right);
+            BranchInstruction ifeq = instrFactory.createBranchInstruction(Const.IFEQ, null);
+            currentInstrList.append(ifeq);
+            InstructionHandle one = currentInstrList.append(new PUSH(constPool, 1));
+            BranchInstruction go = instrFactory.createBranchInstruction(Const.GOTO, null);
+            currentInstrList.append(go);
+            InstructionHandle zero = currentInstrList.append(new PUSH(constPool, 0));
+            InstructionHandle nop = currentInstrList.append(new NOP());
+            if( bropc == Const.IFEQ )
+                bri.setTarget(zero);
+            else if( bropc == Const.IFNE )
+                bri.setTarget(one);
+            go.setTarget(nop);
         }
         else if( e.oper.kind == 'A' ) {
             compile(e.left);
@@ -270,7 +291,7 @@ public class Compiler {
         else if( e.oper.kind == 'C' ) {
             compile(e.left);
             compile(e.right);
-            currentInstrList.append(InstructionConst.DCMPL);
+            currentInstrList.append(InstructionConst.DCMPL); // ICMPL or ...
             
             short bropc = 0;
             if( e.oper.equals(Operation.Eq) )
