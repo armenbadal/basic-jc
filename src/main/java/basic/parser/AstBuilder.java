@@ -41,12 +41,20 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitProgram(BasicParser.ProgramContext ctx)
 	{
 		program = new Program(BasicParser.fileName);
-			
+
+        // create subroutines
 		for( BasicParser.SubroutineContext sc : ctx.subroutine() )
 			program.members.add((Subroutine)visitSubroutine(sc));
 
-		// for( String nm : unresolved.keySet() )
-		// 	System.out.println(nm);
+        // resolve links
+		for( Map.Entry<String,List<Apply>> mi : unresolved.entrySet() )
+            for( Subroutine si : program.members )
+                if( si.name.equals(mi.getKey()) ) {
+                    for( Apply ai : mi.getValue() )
+                        ai.callee = si;
+                    unresolved.remove(mi.getKey());
+                    break;
+                }
 
 		return program;
 	}

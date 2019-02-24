@@ -27,7 +27,7 @@ compileJava {
 
 run {
     classpath += files(project.projectDir.getPath() + '/build/libs/basic-rt.jar')
-	args project.projectDir.getPath() + '/cases/case07.bas'
+	args project.projectDir.getPath() + '/cases/case08.bas'
 }
 
 task runtimeJar(type: Jar) {

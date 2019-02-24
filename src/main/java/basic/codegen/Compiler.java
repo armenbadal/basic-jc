@@ -48,9 +48,8 @@ public class Compiler {
 	{
         try {
             createConstructor();
-            createMain();
-            
             compile(program);
+            createMain();
         }
         catch(Exception ex) {
             ex.printStackTrace();
@@ -92,6 +91,19 @@ public class Compiler {
                                          new Type[] { new ArrayType(Type.STRING, 1) },
                                          new String[] { "args" },
                                          "main", program.name, il, constPool);
+
+        // Search for 'Start' and call it
+        for( Subroutine s : program.members )
+            if( s.name.equals("Start") ) {
+                InvokeInstruction icl =
+                    instrFactory.createInvoke(s.module,
+                                              normalize("Start"),
+                                              Type.DOUBLE,
+                                              Type.NO_ARGS,
+                                              Const.INVOKESTATIC);
+                il.append(icl);
+                break;
+            }
         
         il.append(instrFactory.createReturn(Type.VOID));
         method.setMaxStack();
