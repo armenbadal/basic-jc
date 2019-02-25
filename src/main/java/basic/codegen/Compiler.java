@@ -1,3 +1,6 @@
+/*************************************
+ * Basic-JC կոմպիլյատոր
+ *************************************/
 
 package basic.codegen;
 
@@ -11,7 +14,12 @@ import java.nio.file.*;
 import java.util.HashMap;
 import java.util.Map;
 
-/**/
+/**
+ * {@code Compiler} դասը աբստրակտ քերականական ծառից գեներացնում
+ * է Ջավա վիրտուալ մեքենայի (ՋՎՄ) բայթ-կոդ։
+ *
+ * @author Արմեն Բադալյան
+ */
 public class Compiler {
 	private ClassGen classGen = null;
 	private ConstantPoolGen constPool = null;
@@ -195,6 +203,11 @@ public class Compiler {
 			compile((Call)s);
 	}
 
+    /**
+     * Կոդի գեներացիա հրամանների հաջորդականության համար։
+     * 
+     * @param {@code s} հրամանների հաջորդականություն։
+     */
     private void compile( Sequence s )
     {
         for( Statement si : s.items )
@@ -214,20 +227,30 @@ public class Compiler {
     
     private void compile( Input s )
     {
-        // TODO: call basic.runtime.read<Real|Text>
+        String reader_f = "input" + s.place.type.toString();
+        currentInstrList.append(new PUSH(constPool, s.prompt));
+        InvokeInstruction inpf = 
+            instrFactory.createInvoke("basic.runtime.IO", reader_f, Type.VOID,
+                                       new Type[] { Type.STRING },
+                                       Const.INVOKESTATIC);
+            currentInstrList.append(inpf);
+        
+        Integer ix = nameMap.get(s.place.name);
+        if( ix != null ) {
+            Type yp = typeMap.get(s.place.type);
+            currentInstrList.append(instrFactory.createStore(yp, ix));
+        }
     }
 
     private void compile( Print s )
     {
-        currentInstrList.append(instrFactory.createFieldAccess("java.lang.System",
-            "out", new ObjectType("java.io.PrintStream"), Const.GETSTATIC));
-
         compile(s.expr);
-        // TODO: call basic.runtime.print<Real|Text>
+
+        String writer_f = "print" + s.expr.type.toString();
         Type ety = typeMap.get(s.expr.type);
         InvokeInstruction pln =
-            instrFactory.createInvoke("java.io.PrintStream", "println", Type.VOID,
-                                      new Type[] { ety }, Const.INVOKEVIRTUAL);
+            instrFactory.createInvoke("basic.runtime.IO", writer_f, Type.VOID,
+                                      new Type[] { ety }, Const.INVOKESTATIC);
         currentInstrList.append(pln);
     }
 

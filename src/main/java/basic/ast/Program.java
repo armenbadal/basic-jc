@@ -1,3 +1,6 @@
+/*************************************
+ * Basic-JC կոմպիլյատոր
+ *************************************/
 
 package basic.ast;
 
@@ -5,9 +8,23 @@ import java.nio.file.*;
 import java.util.List;
 import java.util.ArrayList;
 
+/**
+ * Ծրագրի մոդելը աբստրակտ քերականական ծառում։
+ *
+ * @author Արմեն Բադալյան
+ */
 public class Program extends Node {
+	/**
+	 * Ծրագրի տեքստի ֆայլի ճանապարհը։
+	 */
 	public Path path;
+	/**
+	 * Ծրագիր անունը։
+	 */
     public String name;
+	/**
+	 * Ենթածրագրերի ցուցակը։
+	 */
 	public List<Subroutine> members;
 
 	public Program( String ph )
@@ -28,6 +45,7 @@ public class Program extends Node {
 			res += si.toString();
 			res += "\n";
 		}
+		res += "' - - - - - - - - - -\n";
 		return res;
 	}
 }

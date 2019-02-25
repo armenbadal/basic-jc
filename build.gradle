@@ -30,6 +30,10 @@ run {
 	args project.projectDir.getPath() + '/cases/case08.bas'
 }
 
+javadoc {
+    options.encoding "UTF-8"
+}
+
 task runtimeJar(type: Jar) {
     archiveBaseName = 'basic-rt'
     from sourceSets.main.output

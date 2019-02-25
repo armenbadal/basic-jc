@@ -1,4 +1,7 @@
-
+/*************************************
+ * Basic-JC կոմպիլյատոր
+ *************************************/
+ 
 package basic.ast;
 
 public class Binary extends Expression {
@@ -19,4 +22,3 @@ public class Binary extends Expression {
 		return left.toString() + " " + oper.mnemonic + " " + right.toString();
 	}
 }
-
