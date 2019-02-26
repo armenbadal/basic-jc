@@ -417,7 +417,7 @@ public class Compiler {
     private void compile( Variable e )
     {
         Integer ix = nameMap.get(e.name);
-        if( ix != null ) {
+        if( ix != null ) { // null checking is extra
             Type y = typeMap.get(e.type);
             currentInstrList.append(instrFactory.createLoad(y, ix));
         }
@@ -425,16 +425,19 @@ public class Compiler {
     
     private void compile( Real e )
     {
+        // TODO: InstructionFactory.createConstant(Object value) ?
         currentInstrList.append(new PUSH(constPool, e.value));
     }
         
     private void compile( Text e )
     {
+        // TODO: InstructionFactory.createConstant(Object value) ?
         currentInstrList.append(new PUSH(constPool, e.value));
     }
 
     private void compile( Logic e )
     {
+        // TODO: InstructionFactory.createConstant(Object value) ?
         currentInstrList.append(new PUSH(constPool, e.value));
     }
 

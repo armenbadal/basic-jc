@@ -6,12 +6,12 @@ package basic.parser;
 }
 
 @parser::members {
-    public static String fileName = null;
+    public static String sourceFileName = null;
 
     public BasicParser( String name, TokenStream tokens )
     {
         this(tokens);
-        fileName = name;
+        sourceFileName = name;
     }
 }
 

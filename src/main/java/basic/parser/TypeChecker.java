@@ -117,7 +117,7 @@ public class TypeChecker {
 
 	public void check( Binary e ) throws TypeError
     {
-         check(e.left);
+        check(e.left);
         check(e.right);
 
         if( e.left.type == Node.Type.Real && e.right.type == Node.Type.Real ) {
@@ -161,11 +161,21 @@ public class TypeChecker {
 
 	public void check( Apply e ) throws TypeError
     {
-        check(e.callee);
-        for( Expression a : e.arguments )
-            check(a);
+        // կիրառվող ենթածրագրի պարամետրերի քանակը պետք է հավասար
+        // լինի տրված արգումենտների քանակին
+        if( e.callee.parameters.size() != e.arguments.size() )
+            throw new TypeError();
         
-        // TODO: compare signature and parameter list
+        // կիրառման տիպը կիրառվող ենթածրագրի տիպն է
+        type = Node.Type.of(e.callee.name);
+
+        // պարամետրերի և արգումենտների տիպերի համապատասխանություն
+        Iterator<String> pari = e.callee.parameters.iterator();
+        for( Expression a : e.arguments ) {
+            check(a);
+            if( a.type != Node.Type.of(pari.next()) )
+                throw new TypeError();
+        }
     }
 
 	public void check( Variable e )

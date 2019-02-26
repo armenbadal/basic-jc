@@ -5,7 +5,6 @@
 package basic.ast;
 
 import java.util.List;
-import java.util.ArrayList;
 
 /**
  * {@code Apply} դասը ֆունկցիա-ենթածրագիր կիրառության մոդելն է։
@@ -22,10 +21,10 @@ public class Apply extends Expression {
 	 */
 	public List<Expression> arguments;
 
-	public Apply( Subroutine cl )
+	public Apply( Subroutine cl, List<Expression> args )
 	{
 		callee = cl;
-		arguments = new ArrayList<>();
+		arguments = args;
 	}
 }
 

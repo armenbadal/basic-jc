@@ -1,3 +1,6 @@
+/*************************************
+ * Basic-JC կոմպիլյատոր
+ *************************************/
 
 package basic.parser;
 
@@ -15,15 +18,28 @@ import java.util.stream.Collectors;
 
 import java.io.IOException;
 
-///
+/**
+ * <em>Վերացական (աբստրակտ) քերականական ծառի</em> կառուցման մեթոդները։
+ *
+ *
+ * @author Արմեն Բադալյան
+ */
 public class AstBuilder extends BasicBaseVisitor<Node> {
-	// AST֊ի արմատը
+	/**
+	 * Ծառի (AST) արմատը
+	 */
 	private Program program = null;
-	// ընթացիկ վերլուծվող ենթածրագիրը
+	/**
+	 * Ընթացիկ վերլուծվող ենթածրագրի հղումը
+	 */
 	private Subroutine current = null;
-	// ենթածրագրերի չլուծված կանչեր
+	/**
+	 * Ենթածրագրերի չլուծված կանչեր
+	 */
 	private Map<String,List<Apply>> unresolved = new HashMap<>();
-    // ներդրված ենթածրագրերի գրադարան
+    /**
+	 * Ներդրված ենթածրագրերի գրադարան
+	 */
     private BuiltIns builtins;
     
 	///
@@ -40,7 +56,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitProgram(BasicParser.ProgramContext ctx)
 	{
-		program = new Program(BasicParser.fileName);
+		program = new Program(BasicParser.sourceFileName);
 
         // create subroutines
 		for( BasicParser.SubroutineContext sc : ctx.subroutine() )
@@ -90,29 +106,37 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitStatLet(BasicParser.StatLetContext ctx)
 	{
-		return new Let(searchVariable(ctx.IDENT().getText()),
-					   (Expression)visit(ctx.expression()));
+		Variable place = searchVariable(ctx.IDENT().getText());
+		Expression exp = (Expression)visit(ctx.expression());
+		return new Let(place, exp);
 	}
 
 	@Override
 	public Node visitStatInput(BasicParser.StatInputContext ctx)
 	{
+		// հրավերքը
 		String prompt = "? ";
 		if( ctx.TEXT() != null )
 			prompt = ctx.TEXT().getText() + " ";
-		return new Input(prompt, searchVariable(ctx.IDENT().getText()));
+		// ներմուծվող փոփոխականը
+		Variable place = searchVariable(ctx.IDENT().getText());
+		return new Input(prompt, place);
 	}
 
 	@Override
 	public Node visitStatPrint(BasicParser.StatPrintContext ctx)
 	{
-		return new Print((Expression)visit(ctx.expression()));
+		// արտածվող արտահայտություն
+		Expression exp = (Expression)visit(ctx.expression());
+		return new Print(exp);
 	}
 
 	@Override
 	public Node visitStatIf(BasicParser.StatIfContext ctx)
 	{
+		// պայմանը
 		Expression cn = (Expression)visit(ctx.mcond);
+		// հաստատված ճյուղը
 		Statement de = (Statement)visitSequence(ctx.mseq);
 		If sif = new If(cn, de, null);
 		
@@ -133,7 +157,9 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitStatWhile(BasicParser.StatWhileContext ctx)
 	{
+		// ցիկլի պայմանը
 		Expression c = (Expression)visit(ctx.expression());
+		// ցիկլի մարմինը
 		Statement b = (Statement)visitSequence(ctx.sequence());
 		return new While(c, b);
 	}
@@ -141,13 +167,18 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitStatFor(BasicParser.StatForContext ctx)
 	{
+		// ցիկլի պարամետրը
 		Variable p = searchVariable(ctx.IDENT().getText());
+		// սկզբնական արժեքը
 		Expression f = (Expression)visit(ctx.from);
+		// սահմանյին արժեքը
 		Expression t = (Expression)visit(ctx.to);
+		// քայլը
 		double sv = 1.0;
 		if( ctx.step != null )
 			sv = Double.parseDouble(ctx.step.getText());
 		Real s = new Real(sv);
+		// մարմինը
 		Statement b = (Statement)visitSequence(ctx.sequence());
 		return new For(p, f, t, s, b);
 	}
@@ -156,15 +187,18 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitStatCall(BasicParser.StatCallContext ctx)
 	{
 		String nm = ctx.IDENT().getText();
-		Subroutine sbr = searchSubroutine(nm);
-		Apply ay = new Apply(sbr);
+
+		List<Expression> args = new ArrayList<>();
 		for( BasicParser.ExpressionContext ec : ctx.expression() )
-			ay.arguments.add((Expression)visit(ec));
+			args.add((Expression)visit(ec));
+
+		Subroutine sbr = searchSubroutine(nm);
+		Apply apy = new Apply(sbr, args);
 
 		if( sbr == null )
-			addUnresolved(nm, ay);
+			addUnresolved(nm, apy);
 		
-		return new Call(ay);
+		return new Call(apy);
 	}
 
 	
@@ -234,16 +268,22 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	@Override
 	public Node visitApply(BasicParser.ApplyContext ctx)
 	{
+		// կանչվող ենթածրագրի անունը
 		String nm = ctx.IDENT().getText();
-		Subroutine sbr = searchSubroutine(nm);
-		Apply ay = new Apply(sbr);
+
+		// արգումենտների արտահայտությունները
+		List<Expression> args = new ArrayList<>();
 		for( BasicParser.ExpressionContext ec : ctx.expression() )
-			ay.arguments.add((Expression)visit(ec));
+			args.add((Expression)visit(ec));
 
+		// որոնել ենթածրագիրը
+		Subroutine sbr = searchSubroutine(nm);
+		// կիրառման օբյեկտը
+		Apply apy = new Apply(sbr, args);
 		if( sbr == null )
-			addUnresolved(nm, ay);
+			addUnresolved(nm, apy);
 
-		return ay;
+		return apy;
 	}
 
 	@Override
@@ -281,14 +321,22 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		return searchVariable(vnm);
 	}
 
-	///
+	/**
+	 * Տրված անունով փոփոխական
+	 *
+	 * @param vnm Փոփոխականի անունը
+	 * @return Նոր ստեղծված կամ գոյություն ունեցող փոփոխականի հողումը 
+	 */
 	private Variable searchVariable( String vnm )
 	{
+		// փնտրել ընթացիկ ենթածրագրի լոկալ անունների ցուցակում
 		for( Variable vi : current.locals )
 			if( vi.name.equals(vnm) )
 				return vi;
 
+		// ստեղցծել նոր օբյեկտ ...
 		Variable vr = new Variable(vnm);
+		// ... և ավելացնել ընթացիկ ենթածրագրի լոկալ անունների ցուցակում
 		current.locals.add(vr);
 		
 		return vr;
