@@ -120,33 +120,61 @@ public class TypeChecker {
         check(e.left);
         check(e.right);
 
-        if( e.left.type == Node.Type.Real && e.right.type == Node.Type.Real ) {
-            boolean allowed = e.oper == Operation.Add;
-            allowed = allowed || e.oper == Operation.Sub;
-            allowed = allowed || e.oper == Operation.Mul;
-            allowed = allowed || e.oper == Operation.Div;
-            allowed = allowed || e.oper == Operation.Pow;
-            if( !allowed )
-                throw new TypeError();
-        }
-        else if( e.left.type == Node.Type.Text && e.right.type == Node.Type.Text ) {
-            if( e.oper != Operation.Conc )
-                throw new TypeError();
-        }
-        else if( e.left.type == Node.Type.Logic && e.right.type == Node.Type.Logic ) {
-            if( e.oper != Operation.And || e.oper != Operation.Or )
-                throw new TypeError();
-        }
+        if( e.left.type != e.right.type )
+            throw new TypeError();
 
-        if( e.left.type == e.right.type ) {
-            boolean allowed = e.oper == Operation.Eq;
-            allowed = allowed || e.oper == Operation.Ne;
-            allowed = allowed || e.oper == Operation.Gt;
-            allowed = allowed || e.oper == Operation.Ge;
-            allowed = allowed || e.oper == Operation.Lt;
-            allowed = allowed || e.oper == Operation.Le;
-            if( !allowed )
-                throw new TypeError();
+        if( e.left.type == Node.Type.Real ) {
+            // իրական արժեքների թույլատրելի գործողությունները
+            switch( e.oper ) {
+                case Add:
+                case Sub:
+                case Mul:
+                case Div:
+                case Pow:
+                    e.type = Node.Type.Real;
+                    break;
+                case Eq:
+                case Ne:
+                case Gt:
+                case Ge:
+                case Lt:
+                case Le:
+                    e.type = Node.Type.Logic;
+                    break;
+                default:
+                    throw new TypeError();                
+            }
+        }
+        else if( e.left.type == Node.Type.Text ) {
+            // տեքստային արժեքների թույլատրելի գործողությունները
+            switch( e.oper ) {
+                case Conc:
+                    e.type = Node.Type.Text;
+                    break;
+                case Eq:
+                case Ne:
+                case Gt:
+                case Ge:
+                case Lt:
+                case Le:
+                    e.type = Node.Type.Logic;
+                    break;
+                default:
+                    throw new TypeError();                
+            }
+        }
+        else if( e.left.type == Node.Type.Logic ) {
+            // տրամաբանական արժեքների թույլատրելի գործողությունները
+            switch( e.oper ) {
+                case And:
+                case Or:
+                case Eq:
+                case Ne:
+                    e.type = Node.Type.Logic;
+                    break;
+                default:
+                    throw new TypeError();                
+            }
         }
     }
 
