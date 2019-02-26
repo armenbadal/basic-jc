@@ -3,6 +3,8 @@ package basic.parser;
 
 import basic.ast.*;
 
+import java.util.Iterator;
+
 public class TypeChecker {
     public void check( Program p ) throws TypeError
     {
@@ -195,7 +197,7 @@ public class TypeChecker {
             throw new TypeError();
         
         // կիրառման տիպը կիրառվող ենթածրագրի տիպն է
-        type = Node.Type.of(e.callee.name);
+        e.type = Node.Type.of(e.callee.name);
 
         // պարամետրերի և արգումենտների տիպերի համապատասխանություն
         Iterator<String> pari = e.callee.parameters.iterator();
