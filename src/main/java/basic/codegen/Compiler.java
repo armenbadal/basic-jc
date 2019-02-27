@@ -257,10 +257,46 @@ public class Compiler {
     {}
 
     private void compile( For s )
-    {}
+    {
+        // հաշվիչին վերագրել սկզբնական արժեքը
+        compile(s.from);
+        final int pri = nameMap.get(s.param.name);
+        currentInstrList.append(instrFactory.createStore(Type.DOUBLE, pri));
+
+        // ցիկլը շարունակելու կամ ավարտելու պայմանը
+        InstructionHandle repeat = currentInstrList.append(new NOP());
+        currentInstrList.append(instrFactory.createLoad(Type.DOUBLE, pri));
+        compile(s.to);
+        currentInstrList.append(InstructionConst.DCMPL);
+        short brop = Const.IFEQ;
+        if( s.step.value > 0 )
+            brop = Const.IFGT;
+        else if( s.step.value < 0 )
+            brop = Const.IFLT;
+        BranchInstruction bri = instrFactory.createBranchInstruction(brop, null);
+        currentInstrList.append(bri);
+
+        // ցիկլի մարմինը
+        compile(s.body);
+        
+        // փոխել հաշվիչի արժեքը
+        currentInstrList.append(instrFactory.createLoad(Type.DOUBLE, pri));
+        compile(s.step);
+        currentInstrList.append(InstructionConst.DADD);
+        currentInstrList.append(instrFactory.createStore(Type.DOUBLE, pri));
+
+        // կրկնել
+        currentInstrList.append(instrFactory.createBranchInstruction(Const.GOTO, repeat));
+
+        // ցիկլի վերջը
+        InstructionHandle exit = currentInstrList.append(new NOP());
+        bri.setTarget(exit);
+    }
 
     private void compile( Call s )
-    {}
+    {
+        compile(s.caller);
+    }
     
 
     private void compile( Expression e )
