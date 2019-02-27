@@ -146,7 +146,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		If sif = new If(cn, de, null);
 		
 		If si = sif;
-		for( int i = 1; i < ctx.scond.size(); ++i ) {
+		for( int i = 0; i < ctx.scond.size(); ++i ) {
 			cn = (Expression)visit(ctx.scond.get(i));
 			de = (Statement)visitSequence(ctx.sseq.get(i));
 			si.alternative = new If(cn, de, null);

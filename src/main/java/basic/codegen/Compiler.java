@@ -11,8 +11,11 @@ import org.apache.bcel.classfile.*;
 import org.apache.bcel.generic.*;
 
 import java.nio.file.*;
-import java.util.HashMap;
 import java.util.Map;
+import java.util.HashMap;
+import java.util.List;
+import java.util.ArrayList;
+
 
 /**
  * {@code Compiler} դասը աբստրակտ քերականական ծառից գեներացնում
@@ -251,7 +254,35 @@ public class Compiler {
     }
 
     private void compile( If s )
-    {}
+    {
+        // IF := <condition, decision, alternative>
+        Statement p = s;
+        List<BranchInstruction> gofis = new ArrayList<>();
+        while( p instanceof If ) {
+            If f = (If)p;
+            // ճյուղավորման պայմանը
+            compile(f.condition);
+            BranchInstruction bri = instrFactory.createBranchInstruction(Const.IFEQ, null); // ?
+            currentInstrList.append(bri);
+            // then ճյուղը
+            compile(f.decision);
+            BranchInstruction fi = instrFactory.createBranchInstruction(Const.GOTO, null);
+            currentInstrList.append(fi);
+            gofis.add(fi);
+            InstructionHandle alte = currentInstrList.append(new NOP());
+            bri.setTarget(alte);
+            // անցում else ճյուղին
+            p = f.alternative;
+        }
+
+        // վերջին else բլոկը
+        if( p != null )
+            compile(p);
+
+        // ճյուղավորման վերջը
+        InstructionHandle endif = currentInstrList.append(new NOP());
+        gofis.forEach(e -> e.setTarget(endif));
+    }
 
     private void compile( While s )
     {
