@@ -87,9 +87,14 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 		// ենթածրագիր տրված անունով
 		current = new Subroutine(program.name, sname, pars);
 
+		// ենթածրագրերի պարամետրերը լոկոլ փոփոխականներ են
 		current.parameters.forEach(p -> current.locals.add(new Variable(p)));
+		// ենթածրագրի անունը նույնպես լոկալ փոփոխական է, որպես վերադարձվող արժեք
+		current.locals.add(new Variable(sname));
 
+		// կառուցել ենթածրագրի մարմնի ենթածառը
 		current.body = (Statement)visitSequence(ctx.sequence());
+
 		return current;
 	}
 
@@ -318,7 +323,7 @@ public class AstBuilder extends BasicBaseVisitor<Node> {
 	public Node visitVariable(BasicParser.VariableContext ctx)
 	{
 		String vnm = ctx.IDENT().getText();
-		return searchVariable(vnm);
+		return searchVariable(vnm); // TODO: օգտագործման կետում փոփոխականը պետք է արժեք ստացած լինի
 	}
 
 	/**

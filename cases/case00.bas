@@ -1,5 +1,5 @@
 
 ' առաջին օրինակ
-SUB Main
+SUB Start
     PRINT "Hello, world!"
 END SUB

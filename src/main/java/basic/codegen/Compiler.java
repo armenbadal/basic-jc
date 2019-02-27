@@ -156,21 +156,21 @@ public class Compiler {
 										 retype, partypes, parnames, normalize(subr.name),
                                          program.name, currentInstrList, constPool);
 
+        // վերադարձվող արժեքի փոփխականին վերագրել զրոյական արժեք
+        CompoundInstruction cip = new PUSH(constPool, 0.0);
+        if( retype.equals(Type.STRING) )
+            cip = new PUSH(constPool, "");
+        else if( retype.equals(Type.BOOLEAN) )
+            cip = new PUSH(constPool, false);
+        currentInstrList.append(cip);
+        int rvi = nameMap.get(subr.name);
+        currentInstrList.append(instrFactory.createStore(retype, rvi));
+
         // ենթածրագրի մարմինը
         compile(subr.body);
 
-        // վերադարձվող արժեքը
-        Integer rvi = nameMap.get(subr.name);
-        if( rvi != null )
-            currentInstrList.append(instrFactory.createLoad(retype, rvi));
-        else {
-            CompoundInstruction cip = new PUSH(constPool, 0.0);
-            if( retype.equals(Type.STRING) )
-                cip = new PUSH(constPool, "");
-            else if( retype.equals(Type.BOOLEAN) )
-                cip = new PUSH(constPool, false);
-            currentInstrList.append(cip);
-        }
+        // արժեքի վերադարձը ենթածրագրից
+        currentInstrList.append(instrFactory.createLoad(retype, rvi));
 		currentInstrList.append(instrFactory.createReturn(retype));
         
 		method.setMaxStack();
@@ -219,10 +219,8 @@ public class Compiler {
         compile(s.expr);
 
         Integer ix = nameMap.get(s.place.name);
-        if( ix != null ) {
-            Type yp = typeMap.get(s.place.type);
-            currentInstrList.append(instrFactory.createStore(yp, ix));
-        }
+        Type yp = typeMap.get(s.place.type);
+        currentInstrList.append(instrFactory.createStore(yp, ix));
     }
     
     private void compile( Input s )
@@ -236,10 +234,8 @@ public class Compiler {
             currentInstrList.append(inpf);
         
         Integer ix = nameMap.get(s.place.name);
-        if( ix != null ) {
-            Type yp = typeMap.get(s.place.type);
-            currentInstrList.append(instrFactory.createStore(yp, ix));
-        }
+        Type yp = typeMap.get(s.place.type);
+        currentInstrList.append(instrFactory.createStore(yp, ix));
     }
 
     private void compile( Print s )
@@ -417,27 +413,22 @@ public class Compiler {
     private void compile( Variable e )
     {
         Integer ix = nameMap.get(e.name);
-        if( ix != null ) { // null checking is extra
-            Type y = typeMap.get(e.type);
-            currentInstrList.append(instrFactory.createLoad(y, ix));
-        }
+        Type y = typeMap.get(e.type);
+        currentInstrList.append(instrFactory.createLoad(y, ix));
     }
     
     private void compile( Real e )
     {
-        // TODO: InstructionFactory.createConstant(Object value) ?
         currentInstrList.append(new PUSH(constPool, e.value));
     }
         
     private void compile( Text e )
     {
-        // TODO: InstructionFactory.createConstant(Object value) ?
         currentInstrList.append(new PUSH(constPool, e.value));
     }
 
     private void compile( Logic e )
     {
-        // TODO: InstructionFactory.createConstant(Object value) ?
         currentInstrList.append(new PUSH(constPool, e.value));
     }
 
