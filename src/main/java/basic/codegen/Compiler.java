@@ -254,7 +254,24 @@ public class Compiler {
     {}
 
     private void compile( While s )
-    {}
+    {
+        // ցիկլի սկիզբը
+        InstructionHandle repeat = currentInstrList.append(new NOP());
+        // կրկնման պայմանը
+        compile(s.condition);
+        BranchInstruction bri = instrFactory.createBranchInstruction(Const.IFEQ, null);
+        currentInstrList.append(bri);
+
+        // ցիկլի մարմինը
+        compile(s.body);
+
+        // կրկնել
+        currentInstrList.append(instrFactory.createBranchInstruction(Const.GOTO, repeat));
+
+        // ցիկլի վերջը
+        InstructionHandle exit = currentInstrList.append(new NOP());
+        bri.setTarget(exit);
+    }
 
     private void compile( For s )
     {

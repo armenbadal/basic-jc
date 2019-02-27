@@ -10,11 +10,5 @@ public class Let extends Statement {
 		place = pl;
 		expr = ex;
 	}
-
-	@Override
-	public String toString()
-	{
-		return "LET " + place.toString() + " = " + expr.toString();
-	}
 }
 
