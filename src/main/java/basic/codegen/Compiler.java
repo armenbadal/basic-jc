@@ -367,92 +367,124 @@ public class Compiler {
 
     private void compile( Binary e )
     {
-        if( e.oper.kind == 'L' ) {
-            compile(e.left);
-            short bropc = 0;
-            if( e.oper.equals(Operation.And) )
-                bropc = Const.IFEQ;
-            else if( e.oper.equals(Operation.Or) )
-                bropc = Const.IFNE;
-            BranchInstruction bri = instrFactory.createBranchInstruction(bropc, null);
-            currentInstrList.append(bri);
-            compile(e.right);
-            BranchInstruction ifeq = instrFactory.createBranchInstruction(Const.IFEQ, null);
-            currentInstrList.append(ifeq);
-            InstructionHandle one = currentInstrList.append(new PUSH(constPool, 1));
-            BranchInstruction go = instrFactory.createBranchInstruction(Const.GOTO, null);
-            currentInstrList.append(go);
-            InstructionHandle zero = currentInstrList.append(new PUSH(constPool, 0));
-            InstructionHandle nop = currentInstrList.append(new NOP());
-            ifeq.setTarget(zero);
-            if( bropc == Const.IFEQ )
-                bri.setTarget(zero);
-            else if( bropc == Const.IFNE )
-                bri.setTarget(one);
-            go.setTarget(nop);
+        switch( e.oper ) {
+            case And:
+            case Or:
+                compileLogicOperations(e);
+                break;
+            case Add:
+            case Sub:
+            case Mul:
+            case Div:
+            case Pow:
+                compileArithmeticOperations(e);
+                break;
+            case Eq:
+            case Ne:
+            case Gt:
+            case Ge:
+            case Lt:
+            case Le:
+                compileComparisonOperations(e);
+                break;
+            case Conc:
+                compileTextOperations(e);
+                break;
         }
-        else if( e.oper.kind == 'A' ) {
-            compile(e.left);
-            compile(e.right);
+    }
 
-            if( e.oper.equals(Operation.Add) )
-                currentInstrList.append(InstructionConst.DADD);
-            else if( e.oper.equals(Operation.Sub) )
-                currentInstrList.append(InstructionConst.DSUB);
-            else if( e.oper.equals(Operation.Mul) )
-                currentInstrList.append(InstructionConst.DMUL);
-            else if( e.oper.equals(Operation.Div) )
-                currentInstrList.append(InstructionConst.DDIV);
-            else if( e.oper.equals(Operation.Pow) ) {
-                InvokeInstruction pwf =
-                    instrFactory.createInvoke("java.lang.Math", "pow", Type.DOUBLE,
-                                              new Type[] { Type.DOUBLE, Type.DOUBLE },
-                                              Const.INVOKESTATIC);
-                currentInstrList.append(pwf);
-            }
-        }
-        else if( e.oper.kind == 'C' ) {
-            compile(e.left);
-            compile(e.right);
-            currentInstrList.append(InstructionConst.DCMPL); // ICMPL or ...
-            
-            short bropc = 0;
-            if( e.oper.equals(Operation.Eq) )
-                bropc = Const.IFNE;
-            else if( e.oper.equals(Operation.Ne) )
-                bropc = Const.IFEQ;
-            else if( e.oper.equals(Operation.Gt) )
-                bropc = Const.IFLE;
-            else if( e.oper.equals(Operation.Ge) )
-                bropc = Const.IFLT;
-            else if( e.oper.equals(Operation.Lt) )
-                bropc = Const.IFGE;
-            else if( e.oper.equals(Operation.Le) )
-                bropc = Const.IFGT;
-
-            BranchInstruction bri = instrFactory.createBranchInstruction(bropc, null);
-            currentInstrList.append(bri);
-            currentInstrList.append(new PUSH(constPool, 1));
-            BranchInstruction go = instrFactory.createBranchInstruction(Const.GOTO, null);
-            currentInstrList.append(go);
-            InstructionHandle zero = currentInstrList.append(new PUSH(constPool, 0));
-            InstructionHandle nop = currentInstrList.append(new NOP());
+    private void compileLogicOperations( Binary e )
+    {
+        compile(e.left);
+        short bropc = 0;
+        if( e.oper.equals(Operation.And) )
+            bropc = Const.IFEQ;
+        else if( e.oper.equals(Operation.Or) )
+            bropc = Const.IFNE;
+        BranchInstruction bri = instrFactory.createBranchInstruction(bropc, null);
+        currentInstrList.append(bri);
+        compile(e.right);
+        BranchInstruction ifeq = instrFactory.createBranchInstruction(Const.IFEQ, null);
+        currentInstrList.append(ifeq);
+        InstructionHandle one = currentInstrList.append(new PUSH(constPool, 1));
+        BranchInstruction go = instrFactory.createBranchInstruction(Const.GOTO, null);
+        currentInstrList.append(go);
+        InstructionHandle zero = currentInstrList.append(new PUSH(constPool, 0));
+        InstructionHandle nop = currentInstrList.append(new NOP());
+        ifeq.setTarget(zero);
+        if( bropc == Const.IFEQ )
             bri.setTarget(zero);
-            go.setTarget(nop);
-        }
-        else if( e.oper.kind == 'T' ) {
-            compile(e.left);
-            compile(e.right);
+        else if( bropc == Const.IFNE )
+            bri.setTarget(one);
+        go.setTarget(nop);
+    }
 
-            InvokeInstruction srop = null;
-            if( e.oper.equals(Operation.Conc) )
-                srop = instrFactory.createInvoke("basic.runtime.Text", "_concatenate",
-                                                 Type.STRING,
-                                                 new Type[] { Type.STRING, Type.STRING },
-                                                 Const.INVOKESTATIC);
+    private void compileArithmeticOperations( Binary e )
+    {
+        compile(e.left);
+        compile(e.right);
 
-            currentInstrList.append(srop);
+        if( e.oper.equals(Operation.Add) )
+            currentInstrList.append(InstructionConst.DADD);
+        else if( e.oper.equals(Operation.Sub) )
+            currentInstrList.append(InstructionConst.DSUB);
+        else if( e.oper.equals(Operation.Mul) )
+            currentInstrList.append(InstructionConst.DMUL);
+        else if( e.oper.equals(Operation.Div) )
+            currentInstrList.append(InstructionConst.DDIV);
+        else if( e.oper.equals(Operation.Pow) ) {
+            InvokeInstruction pwf =
+                instrFactory.createInvoke("java.lang.Math", "pow", Type.DOUBLE,
+                                            new Type[] { Type.DOUBLE, Type.DOUBLE },
+                                            Const.INVOKESTATIC);
+            currentInstrList.append(pwf);
         }
+    }
+
+    private void compileComparisonOperations( Binary e )
+    {
+        compile(e.left);
+        compile(e.right);
+        currentInstrList.append(InstructionConst.DCMPL); // ICMPL or ...
+        
+        short bropc = 0;
+        if( e.oper.equals(Operation.Eq) )
+            bropc = Const.IFNE;
+        else if( e.oper.equals(Operation.Ne) )
+            bropc = Const.IFEQ;
+        else if( e.oper.equals(Operation.Gt) )
+            bropc = Const.IFLE;
+        else if( e.oper.equals(Operation.Ge) )
+            bropc = Const.IFLT;
+        else if( e.oper.equals(Operation.Lt) )
+            bropc = Const.IFGE;
+        else if( e.oper.equals(Operation.Le) )
+            bropc = Const.IFGT;
+
+        BranchInstruction bri = instrFactory.createBranchInstruction(bropc, null);
+        currentInstrList.append(bri);
+        currentInstrList.append(new PUSH(constPool, 1));
+        BranchInstruction go = instrFactory.createBranchInstruction(Const.GOTO, null);
+        currentInstrList.append(go);
+        InstructionHandle zero = currentInstrList.append(new PUSH(constPool, 0));
+        InstructionHandle nop = currentInstrList.append(new NOP());
+        bri.setTarget(zero);
+        go.setTarget(nop);
+    }
+
+    private void compileTextOperations( Binary e )
+    {
+        compile(e.left);
+        compile(e.right);
+
+        InvokeInstruction srop = null;
+        if( e.oper.equals(Operation.Conc) )
+            srop = instrFactory.createInvoke("basic.runtime.Text", "_concatenate",
+                                                Type.STRING,
+                                                new Type[] { Type.STRING, Type.STRING },
+                                                Const.INVOKESTATIC);
+
+        currentInstrList.append(srop);
     }
 
     private void compareTexts( Binary e )

@@ -2,30 +2,28 @@
 package basic.ast;
 
 public enum Operation {
-	None("None", 'N'),
-	Or("OR", 'L'),
-	And("AND", 'L'),
-	Eq("=", 'C'),
-	Ne("<>", 'C'),
-	Gt(">", 'C'),
-	Ge(">=", 'C'),
-	Lt("<", 'C'),
-	Le("<=", 'C'),
-	Add("+", 'A'),
-	Sub("-", 'A'),
-	Conc("&", 'T'),
-	Mul("*", 'A'),
-	Div("/", 'A'),
-	Pow("^", 'A'),
-	Not("NOT", 'L');
+	None("None"),
+	Or("OR"),
+	And("AND"),
+	Not("NOT"),
+	Eq("="),
+	Ne("<>"),
+	Gt(">"),
+	Ge(">="),
+	Lt("<"),
+	Le("<="),
+	Add("+"),
+	Sub("-"),
+	Conc("&"),
+	Mul("*"),
+	Div("/"),
+	Pow("^");
 
 	public String mnemonic = "None";
-    public char kind = 'N';
 
-	Operation( String mn, char k )
+	Operation( String mn )
 	{
 		mnemonic = mn;
-        kind = k;
 	}
 
 	///
