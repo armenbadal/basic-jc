@@ -455,6 +455,20 @@ public class Compiler {
         }
     }
 
+    private void compareTexts( Binary e )
+    {
+        compile(e.left);
+        compile(e.right);
+
+        String cmpf = String.format("_%s", e.oper).toLowerCase();
+        InvokeInstruction srop =
+            instrFactory.createInvoke("basic.runtime.Text", cmpf,
+                                      Type.BOOLEAN,
+                                      new Type[] { Type.STRING, Type.STRING },
+                                      Const.INVOKESTATIC);
+        currentInstrList.append(srop);
+    }
+
     private void compile( Unary e )
     {
         compile(e.expr);
