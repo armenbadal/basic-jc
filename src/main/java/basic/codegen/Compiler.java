@@ -126,7 +126,7 @@ public class Compiler {
 	private void compile( Program pr )
 	{
 		for( Subroutine subr : pr.members )
-            if( !subr.isBuiltIn )
+            if( !subr.isBuiltIn() )
                 compile(subr);
 	}
 

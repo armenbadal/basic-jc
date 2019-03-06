@@ -37,7 +37,7 @@ public class Text {
         return s0.compareTo(s1) <= 0;
     }
 
-    @BasicIntrinsic(name="MID$")
+    @BasicIntrinsic(supports="MID$")
     public static String Mid( String sr, double from, double count )
     {
         return sr.substring((int)from, (int)count);

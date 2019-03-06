@@ -6,15 +6,15 @@ import basic.ast.Subroutine;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.ArrayList;
-import java.util.Map;
-import java.util.HashMap;
 import java.util.jar.JarEntry;
 import java.util.jar.JarFile;
 import java.util.stream.*;
 
 import java.io.IOException;
 
+import org.apache.bcel.classfile.AnnotationEntry;
 import org.apache.bcel.classfile.ClassParser;
+import org.apache.bcel.classfile.ElementValuePair;
 import org.apache.bcel.classfile.JavaClass;
 import org.apache.bcel.classfile.Method;
 import org.apache.bcel.generic.Type;
@@ -33,12 +33,6 @@ public class BuiltIns {
         if( rjarname == null )
             throw new IOException("Cannot find runtime JAR in classpath.");
 
-        //
-        Map<Type,String> suffix = new HashMap<>();
-        suffix.put(Type.STRING, "$");
-        suffix.put(Type.DOUBLE, "#");
-        suffix.put(Type.BOOLEAN, "?");
-        
         // գտնել basic-rt֊ի բոլոր public-static մեթոդները
         JarFile jar  = new JarFile(rjarname);
         Enumeration<JarEntry> entries = jar.entries();
@@ -56,17 +50,31 @@ public class BuiltIns {
             for( Method me : jcl.getMethods() ) {
                 if( !me.isPublic() || !me.isStatic() )
                     continue;
-                
-                final Type rt = me.getReturnType();
-                String name = me.getName() + suffix.get(rt);
-                
+
+                // որոնել մեթոդի նշագրումը
+                String supports = null;
+                for( AnnotationEntry ae : me.getAnnotationEntries() )
+                    for( ElementValuePair evp : ae.getElementValuePairs() )
+                        if( evp.getNameString().equals("supports") )
+                            supports = evp.getValue().toString();
+                if( supports == null )
+                    continue;
+
+                // կազմակերպել արգումենտների ցուցակը                
                 List<String> args = new ArrayList<>();
                 int i = 0;
-                for( Type t : me.getArgumentTypes() )
-                    args.add(String.format("a%d%s", i++, suffix.get(t)));
+                for( Type t : me.getArgumentTypes() ) {
+                    char c = '~';
+                    if( Type.STRING.equals(t) )
+                        c = '$';
+                    else if( Type.DOUBLE.equals(t) )
+                        c = '#';
+                    else if( Type.BOOLEAN.equals(t) )
+                        c = '?';
+                    args.add(String.format("a%d%c", i++, c));
+                }
                 
-                Subroutine subr = new Subroutine(module, name, args);
-                subr.isBuiltIn = true;
+                Subroutine subr = new Subroutine(module, supports, args, me.getName());
                 subroutines.add(subr);
             }
         }
