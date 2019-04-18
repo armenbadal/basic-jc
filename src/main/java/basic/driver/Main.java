@@ -11,7 +11,6 @@ public class Main {
 	///
 	public static void compile( String source ) throws Exception
 	{
-		System.out.println("HERE --->>>");
 		CharStream input = CharStreams.fromFileName(source);
         BasicLexer lexer = new BasicLexer(input);
         CommonTokenStream tokens = new CommonTokenStream(lexer);
