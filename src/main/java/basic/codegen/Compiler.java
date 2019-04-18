@@ -396,6 +396,7 @@ public class Compiler {
     private void compileLogicOperations( Binary e )
     {
         compile(e.left);
+        
         short bropc = 0;
         if( e.oper.equals(Operation.And) )
             bropc = Const.IFEQ;
@@ -403,6 +404,7 @@ public class Compiler {
             bropc = Const.IFNE;
         BranchInstruction bri = instrFactory.createBranchInstruction(bropc, null);
         currentInstrList.append(bri);
+        
         compile(e.right);
         BranchInstruction ifeq = instrFactory.createBranchInstruction(Const.IFEQ, null);
         currentInstrList.append(ifeq);

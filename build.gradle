@@ -3,6 +3,7 @@ plugins {
     id 'java'
     id 'application'
     id 'antlr'
+    id 'jacoco'
 }
 
 mainClassName = 'basic.driver.Main'
@@ -10,6 +11,8 @@ mainClassName = 'basic.driver.Main'
 dependencies {
     compile 'org.apache.bcel:bcel:6.2'
     antlr 'org.antlr:antlr4:4.7.1'
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
 }
 
 repositories {
@@ -46,3 +49,19 @@ artifacts {
     archives runtimeJar
 }
 
+test {
+    useJUnitPlatform()
+}
+
+jacoco {
+    toolVersion = "0.8.3"
+    reportsDir = file("${buildDir}/customJacocoReportDir")
+}
+
+jacocoTestReport {
+    reports {
+        xml.enabled true
+        csv.enabled false
+        html.destination file("${buildDir}/jacocoHtml")
+    }
+}
