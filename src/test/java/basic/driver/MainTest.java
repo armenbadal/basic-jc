@@ -21,6 +21,9 @@ public class MainTest {
             Main.compile("cases/case09.bas");
             Main.compile("cases/case10.bas");
             Main.compile("cases/case11.bas");
+            Main.compile("cases/case12.bas");
+            Main.compile("cases/case13.bas");
+            Main.compile("cases/case14.bas");
         }
         catch( Exception e ) {
             assertEquals(1, 2);

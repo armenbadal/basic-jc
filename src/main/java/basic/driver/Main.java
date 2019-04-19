@@ -21,6 +21,13 @@ public class Main {
 		AstBuilder astBuilder = new AstBuilder();
 		basic.ast.Node ast = astBuilder.visit(parseTree);
 		System.out.println(ast);
+		try{
+			TypeChecker checker = new TypeChecker();
+			checker.check((basic.ast.Program)ast);
+		}
+		catch( TypeError er ) {
+			System.err.println(er.getMessage());
+		}
 
         basic.codegen.Compiler cr = new basic.codegen.Compiler((basic.ast.Program)ast);
         cr.compile();

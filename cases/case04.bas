@@ -5,7 +5,7 @@
 '
 
 SUB f#(a, b)
-    LET f# = a + b
+    LET f# = (a + b) * (a - b)
 END SUB
 
 SUB g?(e?)

@@ -37,6 +37,12 @@ public class TypeChecker {
 			check((Call)s);
 	}
 
+    public void check( Sequence s ) throws TypeError
+    {
+        for( Statement si : s.items )
+            check(si);
+    }
+
 	public void check( Let s ) throws TypeError
     {
         check(s.place);

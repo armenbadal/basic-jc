@@ -231,7 +231,8 @@ public class Compiler {
         String reader_f = "input" + s.place.type.toString();
         currentInstrList.append(new PUSH(constPool, s.prompt));
         InvokeInstruction inpf = 
-            instrFactory.createInvoke("basic.runtime.IO", reader_f, Type.VOID,
+            instrFactory.createInvoke("basic.runtime.IO", reader_f,
+                                       typeMap.get(s.place.type),
                                        new Type[] { Type.STRING },
                                        Const.INVOKESTATIC);
             currentInstrList.append(inpf);
