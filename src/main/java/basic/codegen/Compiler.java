@@ -24,19 +24,19 @@ import java.util.ArrayList;
  * @author Արմեն Բադալյան
  */
 public class Compiler {
-	private ClassGen classGen = null;
-	private ConstantPoolGen constPool = null;
-	private InstructionFactory instrFactory = null;
+    private ClassGen classGen = null;
+    private ConstantPoolGen constPool = null;
+    private InstructionFactory instrFactory = null;
     private InstructionList currentInstrList = null;
 
-	private Program program;
+    private Program program;
     private Map<String,Integer> nameMap;
-	
+    
     private Map<basic.ast.Node.Type,Type> typeMap;
 
-	//
-	public Compiler( Program prog )
-	{
+    //
+    public Compiler( Program prog )
+    {
         // տիպերի ձևափոխման աղյուսակ
         typeMap = new HashMap<>();
         typeMap.put(basic.ast.Node.Type.Text, Type.STRING);
@@ -44,19 +44,19 @@ public class Compiler {
         typeMap.put(basic.ast.Node.Type.Logic, Type.BOOLEAN);
 
         //
-		program = prog;
-		
-		classGen = new ClassGen(program.name, "java.lang.Object",
+        program = prog;
+        
+        classGen = new ClassGen(program.name, "java.lang.Object",
                                 program.path.toString(),
-								Const.ACC_PUBLIC | Const.ACC_SUPER,
+                                Const.ACC_PUBLIC | Const.ACC_SUPER,
                                 new String[] {});
-		constPool = classGen.getConstantPool();
-		instrFactory = new InstructionFactory(classGen, constPool);
-	}
+        constPool = classGen.getConstantPool();
+        instrFactory = new InstructionFactory(classGen, constPool);
+    }
 
-	//
-	public void compile()
-	{
+    //
+    public void compile()
+    {
         try {
             createConstructor();
             compile(program);
@@ -73,25 +73,25 @@ public class Compiler {
         catch(java.io.IOException ex) {
             ex.printStackTrace();
         }
-	}
+    }
 
-	// 
-	private void createConstructor()
-	{
-		InstructionList il = new InstructionList();
-		MethodGen method = new MethodGen(Const.ACC_PUBLIC, Type.VOID, Type.NO_ARGS,
-										 new String[] {}, "<init>", program.name,
-										 il, constPool);
+    // 
+    private void createConstructor()
+    {
+        InstructionList il = new InstructionList();
+        MethodGen method = new MethodGen(Const.ACC_PUBLIC, Type.VOID, Type.NO_ARGS,
+                                         new String[] {}, "<init>", program.name,
+                                         il, constPool);
 
-		il.append(instrFactory.createLoad(Type.OBJECT, 0));
-		il.append(instrFactory.createInvoke("java.lang.Object", "<init>", Type.VOID,
-											Type.NO_ARGS, Const.INVOKESPECIAL));
-		il.append(instrFactory.createReturn(Type.VOID));
-		method.setMaxStack();
-		method.setMaxLocals();
-		classGen.addMethod(method.getMethod());
-		il.dispose();
-	}
+        il.append(instrFactory.createLoad(Type.OBJECT, 0));
+        il.append(instrFactory.createInvoke("java.lang.Object", "<init>", Type.VOID,
+                                            Type.NO_ARGS, Const.INVOKESPECIAL));
+        il.append(instrFactory.createReturn(Type.VOID));
+        method.setMaxStack();
+        method.setMaxLocals();
+        classGen.addMethod(method.getMethod());
+        il.dispose();
+    }
 
     //
     private void createMain()
@@ -123,15 +123,15 @@ public class Compiler {
         il.dispose();
     }
 
-	private void compile( Program pr )
-	{
-		for( Subroutine subr : pr.members )
+    private void compile( Program pr )
+    {
+        for( Subroutine subr : pr.members )
             if( !subr.isBuiltIn() )
                 compile(subr);
-	}
+    }
 
-	private void compile( Subroutine subr )
-	{
+    private void compile( Subroutine subr )
+    {
         // հաշվարկել լոկալ փոփոխականների ինդեքսները
         nameMap = new HashMap<>();
         int inx = 0;
@@ -141,7 +141,7 @@ public class Compiler {
         }
         
         // հրամանների ցուցակ
-		currentInstrList = new InstructionList();
+        currentInstrList = new InstructionList();
 
         // վերադարձվող արժեքի տիպն ըստ ֆունկցիայի անվան
         Type retype = typeMap.get(basic.ast.Node.Type.of(subr.name));
@@ -155,8 +155,8 @@ public class Compiler {
             partypes[i] = typeMap.get(basic.ast.Node.Type.of(pn));
         }
 
-		MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
-										 retype, partypes, parnames, normalize(subr.name),
+        MethodGen method = new MethodGen(Const.ACC_PUBLIC | Const.ACC_STATIC,
+                                         retype, partypes, parnames, normalize(subr.name),
                                          program.name, currentInstrList, constPool);
 
         // վերադարձվող արժեքի փոփխականին վերագրել զրոյական արժեք
@@ -174,37 +174,37 @@ public class Compiler {
 
         // արժեքի վերադարձը ենթածրագրից
         currentInstrList.append(instrFactory.createLoad(retype, rvi));
-		currentInstrList.append(instrFactory.createReturn(retype));
+        currentInstrList.append(instrFactory.createReturn(retype));
         
-		method.setMaxStack();
-		method.setMaxLocals();
-		classGen.addMethod(method.getMethod());
+        method.setMaxStack();
+        method.setMaxLocals();
+        classGen.addMethod(method.getMethod());
 
-		currentInstrList.dispose();
+        currentInstrList.dispose();
         currentInstrList = null;
 
         nameMap = null;
-	}
+    }
 
-	private void compile( Statement s )
-	{
-		if( s instanceof Sequence )
-			compile((Sequence)s);
-		else if( s instanceof Let )
-			compile((Let)s);
-		else if( s instanceof Input )
-			compile((Input)s);
-		else if( s instanceof Print )
-			compile((Print)s);
-		else if( s instanceof If )
-			compile((If)s);
-		else if( s instanceof While )
-			compile((While)s);
-		else if( s instanceof For )
-			compile((For)s);
-		else if( s instanceof Call )
-			compile((Call)s);
-	}
+    private void compile( Statement s )
+    {
+        if( s instanceof Sequence )
+            compile((Sequence)s);
+        else if( s instanceof Let )
+            compile((Let)s);
+        else if( s instanceof Input )
+            compile((Input)s);
+        else if( s instanceof Print )
+            compile((Print)s);
+        else if( s instanceof If )
+            compile((If)s);
+        else if( s instanceof While )
+            compile((While)s);
+        else if( s instanceof For )
+            compile((For)s);
+        else if( s instanceof Call )
+            compile((Call)s);
+    }
 
     /**
      * Կոդի գեներացիա հրամանների հաջորդականության համար։
@@ -349,7 +349,7 @@ public class Compiler {
     
 
     private void compile( Expression e )
-	{
+    {
         if( e instanceof Binary )
             compile((Binary)e);
         else if( e instanceof Unary )
@@ -364,7 +364,7 @@ public class Compiler {
             compile((Text)e);
         else if( e instanceof Logic )
             compile((Logic)e);
-	}
+    }
 
     private void compile( Binary e )
     {

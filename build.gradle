@@ -9,7 +9,7 @@ plugins {
 mainClassName = 'basic.driver.Main'
 
 dependencies {
-    compile 'org.apache.bcel:bcel:6.2'
+    implementation 'org.apache.bcel:bcel:6.2'
     antlr 'org.antlr:antlr4:4.7.1'
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.3.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.3.1'
@@ -30,7 +30,7 @@ compileJava {
 
 run {
     classpath += files(project.projectDir.getPath() + '/build/libs/basic-rt.jar')
-	args project.projectDir.getPath() + '/cases/case14.bas'
+    args project.projectDir.getPath() + '/cases/case14.bas'
 }
 
 javadoc {
@@ -55,7 +55,7 @@ test {
 }
 
 jacoco {
-    toolVersion = "0.8.3"
+    toolVersion = "0.8.5"
     reportsDir = file("${buildDir}/customJacocoReportDir")
 }
 

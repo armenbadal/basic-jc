@@ -2,8 +2,8 @@
 ' տեքստերի համեմատման գործողություններ
 '
 
-SUB eq$(x, y)
-    LET eq$ = x = y
+SUB eq$(x$, y$)
+    LET eq$ = x$ = y$
 END SUB
 
 SUB ne$(x, y)
